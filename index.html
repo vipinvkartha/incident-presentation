@@ -1,0 +1,1786 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The 25th hour and beyond - Babbel Incident Post-Mortem</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/reveal.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/theme/white.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #1a202c;
+            --secondary-color: #4a5568;
+            --accent-color: #ff6600;
+            --babbel-orange: #ff6600;
+            --babbel-light-orange: #ff8533;
+            --babbel-dark-orange: #e55a00;
+            --success-color: #38a169;
+            --warning-color: #ff8533;
+            --error-color: #e53e3e;
+            --background-light: #fff8f5;
+            --border-color: #ffe4d1;
+            --text-muted: #8b5a3c;
+        }
+        
+        .reveal {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-weight: 400;
+            color: var(--primary-color);
+        }
+        
+        .reveal .slides {
+            width: 100% !important;
+            height: 100% !important;
+        }
+        
+        .reveal .slides > section {
+            width: 100% !important;
+            height: 100% !important;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        
+        .reveal h1, .reveal h2, .reveal h3 {
+            color: var(--primary-color);
+            text-transform: none;
+            font-weight: 600;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            margin-top: 0;
+            letter-spacing: -0.025em;
+        }
+        
+        .reveal h1 { font-size: 2.2em; font-weight: 700; }
+        .reveal h2 { font-size: 1.8em; font-weight: 600; }
+        .reveal h3 { font-size: 1.3em; font-weight: 500; }
+        
+        .reveal .slides section {
+            text-align: left;
+            padding: 1rem 1.5rem;
+            height: 100vh;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .reveal .title-slide {
+            text-align: center;
+            background: linear-gradient(135deg, var(--babbel-orange) 0%, var(--babbel-dark-orange) 100%);
+        }
+        
+        .reveal p, .reveal li {
+            font-size: 1em;
+            line-height: 1.5;
+            color: var(--secondary-color);
+        }
+        
+        .reveal ul {
+            margin-left: 0;
+            list-style: none;
+        }
+        
+        .reveal li {
+            margin-bottom: 0.5rem;
+            padding-left: 1.2rem;
+            position: relative;
+        }
+        
+        .reveal li:before {
+            content: "•";
+            color: var(--accent-color);
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+        
+        /* Agenda specific styling */
+        .agenda-list {
+            list-style: none;
+            margin: 1rem 0;
+            padding: 0;
+            counter-reset: agenda-counter;
+        }
+        
+        .agenda-item {
+            counter-increment: agenda-counter;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 0.75rem 1rem;
+            margin: 0.5rem 0;
+            border-left: 3px solid var(--babbel-orange);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .agenda-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 102, 0, 0.15);
+        }
+        
+        .agenda-item:before {
+            content: counter(agenda-counter);
+            background: var(--babbel-orange);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 12px;
+            position: static;
+            margin: 0;
+            flex-shrink: 0;
+        }
+        
+        .agenda-icon {
+            font-size: 14px;
+            color: var(--babbel-orange);
+            flex-shrink: 0;
+        }
+        
+        .agenda-text {
+            font-size: 0.9em;
+            font-weight: 500;
+            color: var(--primary-color);
+            margin: 0;
+        }
+        
+        /* Minimalist Timeline */
+        .timeline {
+            position: relative;
+            padding: 1rem 0;
+            margin-left: 1.5rem;
+        }
+        
+        .timeline:before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--border-color);
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding: 1rem 0 1rem 2.5rem;
+            margin-bottom: 1rem;
+            opacity: 0;
+            transform: translateX(20px);
+            animation: slideIn 0.6s ease-out forwards;
+        }
+        
+        .timeline-item:before {
+            content: '';
+            position: absolute;
+            left: -6px;
+            top: 2rem;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            border: 3px solid white;
+            box-shadow: 0 0 0 3px var(--border-color);
+        }
+        
+        .timeline-item.success:before { background: var(--success-color); }
+        .timeline-item.warning:before { background: var(--babbel-orange); }
+        .timeline-item.error:before { background: var(--error-color); }
+        
+        .timeline-time {
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 1em;
+            margin-bottom: 0.5rem;
+        }
+        
+        .timeline-content {
+            color: var(--secondary-color);
+            font-size: 1rem;
+        }
+        
+        /* Clean Cards */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        
+        .card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeUp 0.6s ease-out forwards;
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .card:nth-child(2) { animation-delay: 0.1s; }
+        .card:nth-child(3) { animation-delay: 0.2s; }
+        
+        .card-header {
+            font-size: 1.25em;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .card-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: white;
+        }
+        
+        .card-icon.error { background: var(--error-color); }
+        .card-icon.warning { background: var(--babbel-orange); }
+        .card-icon.success { background: var(--success-color); }
+        
+        /* Clean Code Blocks */
+        .code-block {
+            background: var(--background-light);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+            font-size: 0.9em;
+            margin: 1.5rem 0;
+            position: relative;
+            overflow-x: auto;
+        }
+        
+        .code-block.old {
+            border-left: 4px solid var(--error-color);
+            background: #fef5e7;
+        }
+        
+        .code-block.new {
+            border-left: 4px solid var(--success-color);
+            background: #f0fff4;
+        }
+        
+        .code-label {
+            position: absolute;
+            top: -10px;
+            left: 1rem;
+            background: white;
+            padding: 0 0.5rem;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Stats */
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin: 2rem 0;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 3em;
+            font-weight: 700;
+            color: var(--babbel-orange);
+            display: block;
+            line-height: 1;
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-top: 0.5rem;
+        }
+        
+        /* Action Items */
+        .action-list {
+            list-style: none;
+            margin: 2rem 0;
+        }
+        
+        .action-item {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-left: 4px solid var(--accent-color);
+            opacity: 0;
+            transform: translateX(-20px);
+            animation: slideIn 0.5s ease-out forwards;
+        }
+        
+        .action-item.immediate { border-left-color: var(--error-color); }
+        .action-item.short-term { border-left-color: var(--babbel-orange); }
+        .action-item.long-term { border-left-color: var(--success-color); }
+        
+        .action-item:nth-child(2) { animation-delay: 0.1s; }
+        .action-item:nth-child(3) { animation-delay: 0.2s; }
+        .action-item:nth-child(4) { animation-delay: 0.3s; }
+        
+        /* Background slide specific styles */
+        .background-section {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-left: 5px solid var(--babbel-orange);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .background-section:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        .background-section h3 {
+            color: var(--babbel-dark-orange);
+            font-size: 1.4rem;
+            margin: 0 0 0.8rem 0;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+
+        .background-section h3::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: var(--babbel-orange);
+            border-radius: 50%;
+            margin-right: 0.5rem;
+            flex-shrink: 0;
+        }
+
+        .background-section p {
+            font-size: 1.3rem;
+            line-height: 1.5;
+            margin: 0 0 1rem 0;
+            color: #444;
+        }
+
+        .background-section .code-block {
+            margin: 0.8rem 0;
+            font-size: 1.15rem;
+        }
+
+        .background-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        /* Image lightbox functionality */
+        .clickable-image {
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-radius: 8px;
+            max-width: 100%;
+            height: auto;
+        }
+
+        .clickable-image:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        .lightbox {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 10000;
+            cursor: pointer;
+        }
+
+        .lightbox.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .lightbox-content {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            border-radius: 8px;
+            animation: zoomIn 0.3s ease;
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: white;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 10001;
+        }
+
+        .lightbox-close:hover {
+            color: #bbb;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes zoomIn {
+            from { transform: scale(0.3); }
+            to { transform: scale(1); }
+        }
+
+        /* Learning callout boxes */
+        .learning-callout {
+            margin: 1rem 0;
+            padding: 1rem;
+            background: #f0f9ff;
+            border-left: 4px solid #3b82f6;
+            border-radius: 6px;
+            position: relative;
+        }
+
+        .learning-callout.warning {
+            background: #fef3c7;
+            border-left-color: #f59e0b;
+        }
+
+        .learning-callout-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .learning-callout-icon {
+            font-size: 1.2rem;
+            margin-right: 0.5rem;
+        }
+
+        .learning-callout h4 {
+            margin: 0;
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .learning-callout p {
+            margin: 0;
+            font-size: 1.15rem;
+            color: #4b5563;
+            line-height: 1.4;
+        }
+
+        /* Enhanced timeline styles */
+        .detailed-timeline {
+            position: relative;
+            padding: 1rem 0;
+            margin: 2rem 0;
+        }
+
+        .detailed-timeline::before {
+            content: '';
+            position: absolute;
+            left: 30px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(to bottom, var(--babbel-orange), var(--babbel-light-orange));
+        }
+
+        .timeline-event {
+            position: relative;
+            margin: 1.5rem 0;
+            padding-left: 80px;
+            min-height: 60px;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: 18px;
+            top: 8px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+            z-index: 2;
+        }
+
+        .timeline-dot.deploy { background: #10b981; }
+        .timeline-dot.alert { background: #f59e0b; }
+        .timeline-dot.escalation { background: #ef4444; }
+        .timeline-dot.incident { background: #8b5cf6; }
+        .timeline-dot.fix { background: #06b6d4; }
+        .timeline-dot.resolution { background: #059669; }
+
+        .timeline-time {
+            font-weight: 600;
+            color: var(--babbel-dark-orange);
+            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .timeline-content {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-left: 3px solid var(--babbel-light-orange);
+        }
+
+        .timeline-content h4 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1rem;
+            color: var(--primary-color);
+        }
+
+        .timeline-content p {
+            margin: 0;
+            font-size: 1.2rem;
+            line-height: 1.4;
+            color: #555;
+        }
+
+        .timeline-link {
+            color: #3b82f6;
+            text-decoration: none;
+            font-family: monospace;
+            font-size: 0.8rem;
+            word-break: break-all;
+        }
+
+        .timeline-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Timeline fragment effects */
+        .timeline-event.fragment {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease;
+        }
+
+        .timeline-event.fragment.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .timeline-event.fragment.fade-in-then-semi-out.visible:not(.current-fragment) {
+            opacity: 0.4;
+        }
+
+        .timeline-event.fragment.fade-in-then-semi-out.current-fragment {
+            opacity: 1;
+            transform: translateY(0) scale(1.02);
+            box-shadow: 0 4px 12px rgba(255, 102, 0, 0.15);
+        }
+        
+        /* Section Headers */
+        .section-header {
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .section-subtitle {
+            color: var(--text-muted);
+            font-size: 1em;
+            font-weight: 400;
+            margin-top: 0.3rem;
+        }
+        
+        /* Highlight */
+        .highlight {
+            background: var(--background-light);
+            border: 1px solid var(--border-color);
+            padding: 1rem;
+            border-radius: 6px;
+            border-left: 4px solid var(--babbel-orange);
+            margin: 1.5rem 0;
+        }
+        
+        /* Animations */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .fragment.visible {
+            animation: fadeUp 0.4s ease-out;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .reveal .slides section {
+                padding: 0.5rem 1rem;
+            }
+            
+            .card-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .stats {
+                gap: 1.5rem;
+                flex-direction: column;
+            }
+            
+            .reveal h1 { font-size: 1.8em; }
+            .reveal h2 { font-size: 1.5em; }
+            .reveal h3 { font-size: 1.2em; }
+            
+            .timeline {
+                margin-left: 1rem;
+            }
+            
+            .timeline-item {
+                padding: 0.75rem 0 0.75rem 2rem;
+            }
+            
+            .menu-toggle {
+                right: 15px;
+                padding: 5px 10px;
+                font-size: 12px;
+            }
+            
+            .menu-toggle span:last-child {
+                display: none; /* Hide "Menu" text on mobile */
+            }
+            
+            .custom-menu {
+                width: 90vw;
+                left: -90vw;
+            }
+            
+            /* Help button positioning for mobile */
+            .help-button-mobile {
+                bottom: 70px !important;
+                right: 15px !important;
+                width: 30px !important;
+                height: 30px !important;
+                font-size: 14px !important;
+            }
+            
+            /* Agenda responsive adjustments */
+            .agenda-item {
+                padding: 0.6rem 0.8rem;
+                margin: 0.4rem 0;
+                gap: 0.6rem;
+            }
+            
+            .agenda-item:before {
+                width: 22px;
+                height: 22px;
+                font-size: 11px;
+            }
+            
+            .agenda-icon {
+                font-size: 13px;
+            }
+            
+            .agenda-text {
+                font-size: 0.85em;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .reveal .slides section {
+                padding: 0.25rem 0.75rem;
+            }
+            
+            .reveal h1 { font-size: 1.6em; }
+            .reveal h2 { font-size: 1.3em; }
+            .reveal h3 { font-size: 1.1em; }
+            
+            .card {
+                padding: 1rem;
+            }
+            
+            .menu-toggle {
+                right: 10px;
+                padding: 4px 8px;
+                font-size: 11px;
+            }
+            
+            .custom-menu {
+                width: 95vw;
+                left: -95vw;
+            }
+            
+            .help-button-mobile {
+                bottom: 60px !important;
+                right: 10px !important;
+                width: 28px !important;
+                height: 28px !important;
+                font-size: 12px !important;
+            }
+            
+            /* Agenda small mobile adjustments */
+            .agenda-item {
+                padding: 0.5rem 0.6rem;
+                margin: 0.3rem 0;
+                gap: 0.5rem;
+                flex-direction: row;
+                align-items: center;
+            }
+            
+            .agenda-item:before {
+                width: 20px;
+                height: 20px;
+                font-size: 10px;
+            }
+            
+            .agenda-icon {
+                font-size: 12px;
+            }
+            
+            .agenda-text {
+                font-size: 0.8em;
+            }
+        }
+        
+        /* Navigation Enhancements */
+        .reveal .slide-number {
+            background: rgba(0, 0, 0, 0.1);
+            color: var(--primary-color);
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        
+        .reveal .controls {
+            color: var(--accent-color);
+        }
+        
+        /* Custom Navigation Menu */
+        .custom-menu {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 280px;
+            height: 100vh;
+            background: white;
+            border-right: 1px solid var(--border-color);
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            transition: left 0.3s ease;
+            overflow-y: auto;
+        }
+        
+        .custom-menu.open {
+            left: 0;
+        }
+        
+        .menu-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--background-light);
+        }
+        
+        .menu-header h3 {
+            margin: 0;
+            color: var(--primary-color);
+            font-size: 1.2em;
+        }
+        
+        .menu-items {
+            padding: 0;
+            margin: 0;
+            list-style: none;
+        }
+        
+        .menu-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: background 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .menu-item:hover {
+            background: var(--background-light);
+        }
+        
+        .menu-item.active {
+            background: var(--babbel-orange);
+            color: white;
+        }
+        
+        .slide-number-badge {
+            background: var(--border-color);
+            color: var(--primary-color);
+            border-radius: 12px;
+            padding: 2px 8px;
+            font-size: 0.8em;
+            min-width: 20px;
+            text-align: center;
+        }
+        
+        .menu-item.active .slide-number-badge {
+            background: rgba(255,255,255,0.3);
+            color: white;
+        }
+        
+        .menu-toggle {
+            position: absolute;
+            top: 50%;
+            right: 30px;
+            transform: translateY(-50%);
+            z-index: 1001;
+            font-size: 14px;
+            cursor: pointer;
+            color: white;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 6px 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .menu-toggle:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-50%) scale(1.05);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .menu-toggle span:first-child {
+            font-size: 14px;
+        }
+        
+        .menu-toggle span:last-child {
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .menu-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* Babbel Logo Header */
+        .babbel-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: var(--babbel-orange);
+            border-bottom: 3px solid var(--babbel-dark-orange);
+            display: flex;
+            align-items: center;
+            padding: 0 30px;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(255, 102, 0, 0.3);
+        }
+        
+        .babbel-logo {
+            height: 35px;
+            width: auto;
+        }
+        
+        .presentation-title {
+            margin-left: 20px;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        /* Adjust slides to account for header */
+        .reveal .slides {
+            margin-top: 60px !important;
+            height: calc(100vh - 60px) !important;
+        }
+        
+        .reveal .slides > section {
+            height: calc(100vh - 60px) !important;
+            padding-top: 1rem;
+        }
+        
+        /* Title slide adjustments */
+        .reveal .title-slide {
+            margin-top: -60px !important;
+            height: 100vh !important;
+            padding-top: 60px;
+            padding-bottom: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        /* Mobile adjustments for header */
+        @media (max-width: 768px) {
+            .babbel-header {
+                height: 50px;
+                padding: 0 15px;
+            }
+            
+            .babbel-logo {
+                height: 28px;
+            }
+            
+            .presentation-title {
+                font-size: 12px;
+                margin-left: 15px;
+            }
+            
+            .reveal .slides {
+                margin-top: 50px !important;
+                height: calc(100vh - 50px) !important;
+            }
+            
+            .reveal .slides > section {
+                height: calc(100vh - 50px) !important;
+            }
+            
+            .reveal .title-slide {
+                margin-top: -50px !important;
+                padding-top: 50px;
+                padding-bottom: 50px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Babbel Header -->
+    <div class="babbel-header">
+        <svg class="babbel-logo" viewBox="0 0 120 35" xmlns="http://www.w3.org/2000/svg">
+            <!-- Orange background -->
+            <rect x="0" y="0" width="120" height="35" fill="#ff6600" rx="4"/>
+            <!-- Plus sign -->
+            <g fill="white">
+                <rect x="8" y="14" width="8" height="2"/>
+                <rect x="11" y="11" width="2" height="8"/>
+            </g>
+            <!-- Babbel text -->
+            <text x="22" y="22" fill="white" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="600">Babbel</text>
+        </svg>
+        
+        <!-- Menu Toggle Button -->
+        <div class="menu-toggle" id="menuToggle">
+            <span>☰</span>
+            <span>Menu</span>
+        </div>
+    </div>
+
+    <!-- Custom Navigation Menu -->
+    <div class="menu-overlay" id="menuOverlay"></div>
+    <div class="custom-menu" id="customMenu">
+        <div class="menu-header">
+            <h3>Presentation Navigation</h3>
+        </div>
+        <ul class="menu-items" id="menuItems">
+            <!-- Menu items will be populated by JavaScript -->
+        </ul>
+    </div>
+
+    <div class="reveal">
+        <div class="slides">
+            
+            <!-- Title Slide -->
+            <section class="title-slide" data-menu-title="Title">
+                <div style="width: 100%; max-width: 800px; margin: 0 auto; padding-top: 4rem;">
+                    <h1 style="color: white; margin-bottom: 2rem; text-align: center; margin-top: 0;">
+                        The 25th hour and beyond
+                    </h1>
+                    <!--<h3 style="color: rgba(255,255,255,0.9); font-weight: 400; text-align: center; margin-top: 0;">Incident Management Post-Mortem</h3>-->
+                    <p style="color: rgba(255,255,255,0.8); font-size: 1.2em; margin-top: 3rem; font-weight: 300; text-align: center;">
+                        Sep 10, 2025<br>
+                        <span style="font-size: 0.9em;">Presented by: Identity</span>
+                    </p>
+                </div>
+            </section>
+
+            <!-- Agenda -->
+            <section data-transition="fade" data-menu-title="Agenda">
+                <div class="section-header">
+                    <h2 style="font-size: 2rem;">Agenda</h2>
+                </div>
+                <div class="agenda-list">
+                    <div class="agenda-item">
+                        <span class="agenda-icon">📋</span>
+                        <span class="agenda-text">Background</span>
+                    </div>
+                    <div class="agenda-item">
+                        <span class="agenda-icon">🛠️</span>
+                        <span class="agenda-text">Measures taken</span>
+                    </div>
+                    <div class="agenda-item">
+                        <span class="agenda-icon">⚠️</span>
+                        <span class="agenda-text">How Clients got affected?</span>
+                    </div>
+                    <div class="agenda-item">
+                        <span class="agenda-icon">⏰</span>
+                        <span class="agenda-text">Incident timeline</span>
+                    </div>
+                    <div class="agenda-item">
+                        <span class="agenda-icon">👨‍💼</span>
+                        <span class="agenda-text">Incident commander role</span>
+                    </div>
+                    <div class="agenda-item">
+                        <span class="agenda-icon">📊</span>
+                        <span class="agenda-text">Post incident reviews</span>
+                    </div>
+                    <div class="agenda-item">
+                        <span class="agenda-icon">❓</span>
+                        <span class="agenda-text">Q&A</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Background -->
+            <section data-transition="fade" data-menu-title="Background">
+                <div class="section-header">
+                    <h2 style="font-size: 2rem;">Background</h2>
+                    <p class="section-subtitle" style="font-size: 1.2rem;">Business requirement and technical implementation</p>
+                </div>
+                
+                <div class="background-grid">
+                    <div class="background-section fragment fade-up">
+                        <h3>💼 Why Session Management?</h3>
+                        <p>Our B2B team received a request from a potential enterprise customer for <strong>single sign-out functionality</strong>. This required implementing session management infrastructure as a foundational component in Babbel.</p>
+                    </div>
+
+                    <div class="background-section fragment fade-up">
+                        <h3>⚠️ Breaking Changes</h3>
+                        <p>As part of introducing sessions, we made two key changes:</p>
+                        
+                        <div style="margin: 1.2rem 0;">
+                            <h4 style="color: var(--babbel-dark-orange); font-size: 1.1rem; margin: 0 0 0.5rem 0;">1. Updated user-arn header format</h4>
+                            <p class="medium-label" style="color:#dc2626">Old Format</p>
+                            <div class="code-block old">
+                                <div class="code-label">Old Format:</div>
+                                X-Babbel-User-Arn: arn:aws:sts::&lt;AWS_ACCOUNT_ID&gt;:assumed-role/&lt;ROLE_NAME&gt;/account.uuid
+                            </div>
+                            <p class="medium-label" style="color:#173a02">New Format</p>
+                            <div class="code-block new">
+                                <div class="code-label">New Format:</div>
+                                X-Babbel-User-Arn: arn:aws:sts::&lt;AWS_ACCOUNT_ID&gt;:assumed-role/&lt;ROLE_NAME&gt;/account.uuid<strong>@session_id</strong>
+                            </div>
+                        </div>
+                        
+                        <div style="margin: 1.2rem 0;">
+                            <h4 style="color: var(--babbel-dark-orange); font-size: 1.1rem; margin: 0 0 0.5rem 0;">2. Replaced authentication token with session token</h4>
+                            <p style="font-size: 1.2rem; margin: 0; color: #666;">Updated <code>users/me</code> endpoint to use session tokens instead of authentication tokens for enhanced session management.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Measures taken -->
+            <section data-transition="fade" data-menu-title="Measures taken">
+                <div class="section-header">
+                    <h2 style="font-size: 2rem;">Measures taken</h2>
+                    <p class="section-subtitle" style="font-size: 1.2rem;">Pre-release preparation and lessons learned</p>
+                </div>
+                
+                <div class="background-grid">
+                    <div class="background-section fragment fade-up">
+                        <h3>✅ Pre-Release Actions Taken</h3>
+                        <ul style="margin: 0; padding-left: 1.2rem;">
+                            <li style="margin: 0.6rem 0; font-size: 1.2rem; line-height: 1.4;">Communicated breaking changes via <code>#developers</code> channel with advance notice</li>
+                            <li style="margin: 0.6rem 0; font-size: 1.2rem; line-height: 1.4;">Extended <strong>staging environment testing period to 10 days</strong> for validation</li>
+                            <li style="margin: 0.6rem 0; font-size: 1.2rem; line-height: 1.4;">Conducted comprehensive manual search across GitHub repositories to identify affected clients</li>
+                        </ul>
+                    </div>
+
+                    <div class="background-section fragment fade-up">
+                        <h3>🔄 Areas for Improvement</h3>
+                        <ul style="margin: 0; padding-left: 1.2rem;">
+                            <li style="margin: 0.6rem 0; font-size: 1.2rem; line-height: 1.4;"><strong>Enhanced communication strategy</strong> required - single notification insufficient for broad reach</li>
+                            <li style="margin: 0.6rem 0; font-size: 1.2rem; line-height: 1.4;"><strong>Insufficient observability tooling</strong> - no systematic approach to identify client dependencies</li>
+                            <li style="margin: 0.6rem 0; font-size: 1.2rem; line-height: 1.4;"><strong>Missing automated testing framework</strong> for detecting breaking changes in staging environment</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- How Clients got affected -->
+            <section data-transition="fade" data-menu-title="How Clients got affected?">
+                <div class="section-header">
+                    <h2 style="font-size: 2rem;">How Clients got affected?</h2>
+                    <p class="section-subtitle" style="font-size: 1.2rem;">Understanding the authentication failure mechanism</p>
+                </div>
+                
+                <div class="background-grid">
+                    <div class="background-section fragment fade-up">
+                        <h3>🔐 Authentication Mechanism</h3>
+                        <p><code>user-arn-header</code> is used by clients for <strong>authenticating and verifying requests</strong>. They extract the UUID from the user-arn-header to compare against the UUID in the request payload.</p>
+                    </div>
+
+                    <div class="background-section fragment fade-up">
+                        <h3>💥 What Went Wrong</h3>
+                        <p>Authentication <strong>failed</strong> because the format changed in the <code>user-arn-header</code>. Clients were still expecting the old format and couldn't parse the UUID correctly from the new format with the appended session ID.</p>
+                        
+                        <div style="margin-top: 1.5rem; padding: 1rem; background: #fff3f3; border-left: 4px solid #dc2626; border-radius: 6px;">
+                            <div style="display: flex; align-items: center; margin-bottom: 0.5rem;">
+                                <span style="color: #dc2626; font-size: 1.2rem; margin-right: 0.5rem;">⚠️</span>
+                                <strong style="color: #dc2626;">Impact</strong>
+                            </div>
+                            <p style="margin: 0; font-size: 1.2rem; color: #666;">Client applications could no longer extract and validate user UUIDs, causing authentication to fail across multiple services.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Incident timeline -->
+            <section data-transition="fade" data-menu-title="Incident timeline">
+                <div class="section-header">
+                    <h2 style="font-size: 2rem;">Incident timeline</h2>
+                    <p class="section-subtitle" style="font-size: 1.2rem;">Chronological progression of events</p>
+                </div>
+                
+                <div class="detailed-timeline">
+                    <!-- Day 1: July 21st, 2025 -->
+                    <div class="timeline-event fragment fade-in-then-semi-out" data-fragment-index="1">
+                        <div class="timeline-dot deploy">🚀</div>
+                        <div class="timeline-time">July 21, 2025 - 10:15 AM</div>
+                        <div class="timeline-content">
+                            <h4>Production Deployment</h4>
+                            <p>Identity team deployed PR to production containing changes to update user-arn header format.</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-event fragment fade-in-then-semi-out" data-fragment-index="2">
+                        <div class="timeline-dot alert">⚠️</div>
+                        <div class="timeline-time">July 21, 2025 - 10:18 AM</div>
+                        <div class="timeline-content">
+                            <h4>First Rollbar Alert</h4>
+                            <p>Initial error alert triggered in monitoring system.</p>
+                            <p style="margin-top: 0.5rem;">
+                                <a href="https://app.rollbar.com/a/babbel/fix/item/Lesson-Player/24726/occurrence/439348522834#detail" 
+                                   class="timeline-link" target="_blank">
+                                   View Rollbar Alert →
+                                </a>
+                            </p>
+                            
+                            <div style="margin: 1rem 0; text-align: center;">
+                                <img src="rollbar-alert.png" 
+                                     alt="Rollbar Alert Screenshot" 
+                                     class="clickable-image" 
+                                     style="width: 600px; height: auto; border: 1px solid #ddd; border-radius: 8px; cursor: pointer;" />
+                                <p style="font-size: 0.8rem; color: #666; margin-top: 0.5rem; font-style: italic;">Click to enlarge - Rollbar alert details</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-event fragment fade-in-then-semi-out" data-fragment-index="3">
+                        <div class="timeline-dot escalation">📞</div>
+                        <div class="timeline-time">July 21, 2025 - 5:11 PM</div>
+                        <div class="timeline-content">
+                            <h4>CS Operations Detection</h4>
+                            <p>Customer Support Operations team detected issue and notified #ask-study-core channel due to substantial increase in customer support tickets.</p>
+                            
+                            <div style="margin: 1rem 0; text-align: center;">
+                                <img src="support-tickets-spike.png" 
+                                     alt="Support Tickets Spike Dashboard" 
+                                     class="clickable-image" 
+                                     style="width: 600px; height: auto; border: 1px solid #ddd; border-radius: 8px; cursor: pointer;" />
+                                <p style="font-size: 0.8rem; color: #666; margin-top: 0.5rem; font-style: italic;">Click to enlarge - Support ticket spike visualization</p>
+                            </div>
+                            
+                            <div class="learning-callout">
+                                <div class="learning-callout-header">
+                                    <span class="learning-callout-icon">💡</span>
+                                    <h4>Learning: Monitoring Gap</h4>
+                                </div>
+                                <p>We should have detected this from Rollbar alerts instead of relying on customer support escalation. This indicates a critical gap in our monitoring and alerting strategy.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-event fragment fade-in-then-semi-out" data-fragment-index="4">
+                        <div class="timeline-dot incident">📋</div>
+                        <div class="timeline-time">July 21, 2025 - 9:30 PM</div>
+                        <div class="timeline-content">
+                            <h4>Incident Ticket Created</h4>
+                            <p>Formal incident tracking initiated.</p>
+                        </div>
+                    </div>
+
+                    <!-- Day 2: July 22nd, 2025 -->
+                    <div class="timeline-event fragment fade-in-then-semi-out" data-fragment-index="5">
+                        <div class="timeline-dot escalation">📊</div>
+                        <div class="timeline-time">July 22, 2025 - 11:00 AM</div>
+                        <div class="timeline-content">
+                            <h4>Impact Analysis</h4>
+                            <p>Drop in lesson completion rate was reported to content-platform team.</p>
+                            
+                            <div style="margin: 1rem 0; text-align: center;">
+                                <img src="lesson-completion-drop.png" 
+                                     alt="Lesson Completion Rate Drop Chart" 
+                                     class="clickable-image" 
+                                     style="width: 600px; height: auto; border: 1px solid #ddd; border-radius: 8px; cursor: pointer;" />
+                                <p style="font-size: 0.8rem; color: #666; margin-top: 0.5rem; font-style: italic;">Click to enlarge - Lesson completion rate impact analysis</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-event fragment fade-in-then-semi-out" data-fragment-index="6">
+                        <div class="timeline-dot fix">🔄</div>
+                        <div class="timeline-time">July 22, 2025 - 11:25 AM</div>
+                        <div class="timeline-content">
+                            <h4>Emergency Rollback</h4>
+                            <p>Redeployed older version of code in Accounts service, which fixed the issue for new requests.</p>
+                            
+                            <div class="learning-callout warning">
+                                <div class="learning-callout-header">
+                                    <span class="learning-callout-icon">⚠️</span>
+                                    <h4>Learning: Incident Management Process</h4>
+                                </div>
+                                <p>Instead of directly redeploying older version of a service owned by different team, it's better to inform the respective team by creating a PagerDuty incident and assigning to them. Direct rollbacks can have unintended consequences.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-event fragment fade-in-then-semi-out" data-fragment-index="7">
+                        <div class="timeline-dot incident">👥</div>
+                        <div class="timeline-time">July 22, 2025 - 12:10 PM</div>
+                        <div class="timeline-content">
+                            <h4>Team Collaboration</h4>
+                            <p>Identity team was notified and all stakeholders gathered in a huddle to investigate the root cause.</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-event fragment fade-in-then-semi-out" data-fragment-index="8">
+                        <div class="timeline-dot resolution">🔍</div>
+                        <div class="timeline-time">July 22, 2025 - 12:20 PM</div>
+                        <div class="timeline-content">
+                            <h4>Root Cause Identified</h4>
+                            <p>Discovered that one of the services owned by content-platform was still using the old parsing logic for user-arn header.</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-event fragment fade-in-then-semi-out" data-fragment-index="9">
+                        <div class="timeline-dot resolution">✅</div>
+                        <div class="timeline-time">July 22, 2025 - 12:45 PM</div>
+                        <div class="timeline-content">
+                            <h4>Resolution Deployed</h4>
+                            <p>Final fix was deployed, fully resolving the incident.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Incident commander role -->
+            <section data-transition="fade" data-menu-title="Incident commander role">
+                <div class="section-header">
+                    <h2 style="font-size: 2rem;">Incident commander role</h2>
+                    <p class="section-subtitle" style="font-size: 1.2rem;">Key responsibilities during incident management</p>
+                </div>
+                
+                <div class="background-grid">
+                    <div class="background-section fragment fade-up">
+                        <h3>📝 Information Management</h3>
+                        <p>Collect information from stakeholders and <strong>keep the incident ticket updated</strong> with real-time status, findings, and actions taken.</p>
+                    </div>
+
+                    <div class="background-section fragment fade-up">
+                        <h3>📊 Impact Calculation</h3>
+                        <p>Calculate the impact using the formula:</p>
+                        <div style="background: #f8f9fa; padding: 1rem; border-radius: 6px; margin: 1rem 0; text-align: center;">
+                            <strong style="font-size: 1.1rem; color: var(--babbel-dark-orange);">
+                                (Affected Users / Daily Active Users) × 100
+                            </strong>
+                        </div>
+                        <ul style="margin: 1rem 0; padding-left: 1.2rem; font-size: 1.2rem;">
+                            <li style="margin: 0.4rem 0;"><strong>Affected users:</strong> Retrieved from logs, events, or Rollbar occurrences</li>
+                            <li style="margin: 0.4rem 0;"><strong>Daily active users:</strong> Retrieved from Amplitude analytics</li>
+                        </ul>
+                        
+                        <div style="margin: 1.5rem 0; text-align: center;">
+                            <img src="impact-analysis.png" 
+                                 alt="Impact Analysis Dashboard" 
+                                 class="clickable-image" 
+                                 style="width: 600px; height: auto; border: 1px solid #ddd; border-radius: 8px; cursor: pointer;" />
+                            <p style="font-size: 0.8rem; color: #666; margin-top: 0.5rem; font-style: italic;">Click to enlarge - Impact analysis calculation</p>
+                        </div>
+                    </div>
+
+                    <div class="background-section fragment fade-up">
+                        <h3>📅 Post-Incident Reviews</h3>
+                        <p>Schedule post-incident reviews <strong>ASAP</strong> with the following approach:</p>
+                        <ul style="margin: 1rem 0; padding-left: 1.2rem; font-size: 1.2rem;">
+                            <li style="margin: 0.5rem 0;">Involve <strong>all stakeholders</strong> who were part of the incident</li>
+                            <li style="margin: 0.5rem 0;">If <strong>multiple teams</strong> are involved, conduct <strong>multiple reviews</strong> to ensure comprehensive coverage</li>
+                        </ul>
+                    </div>
+
+                    <div class="background-section fragment fade-up">
+                        <h3>⚡ Severity Adjustment</h3>
+                        <p>After completing impact analysis, <strong>adjust the severity</strong> of the incident if required based on the calculated impact and business implications.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Post incident reviews -->
+            <section data-transition="fade" data-menu-title="Post incident reviews">
+                <div class="section-header">
+                    <h2 style="font-size: 2rem;">Post incident reviews</h2>
+                    <p class="section-subtitle" style="font-size: 1.2rem;">Process and action item management</p>
+                </div>
+                
+                <div class="background-grid">
+                    <div class="background-section fragment fade-up">
+                        <h3>📋 Create Post Incident Review</h3>
+                        <ul style="margin: 1rem 0; padding-left: 1.2rem; font-size: 1.2rem;">
+                            <li style="margin: 0.5rem 0;">Use the <strong>predefined template</strong> from Babbel's process documentation</li>
+                            <li style="margin: 0.5rem 0;"><strong>Duplicate</strong> the template and add incident-specific details</li>
+                        </ul>
+                        
+                        <div style="margin: 1rem 0;">
+                            <p style="font-size: 0.85rem; color: #666; margin-bottom: 0.5rem;">
+                                <a href="https://babbel.atlassian.net/wiki/spaces/BIM/pages/883982560/Template+I+Post-Incident+Review" 
+                                   class="timeline-link" target="_blank">
+                                   View Template: Post-Incident Review →
+                                </a>
+                            </p>
+                        </div>
+                        
+                        <div style="margin: 1.5rem 0; text-align: center;">
+                            <img src="post-incident-template.png" 
+                                 alt="Post Incident Review Template" 
+                                 class="clickable-image" 
+                                 style="width: 600px; height: auto; border: 1px solid #ddd; border-radius: 8px; cursor: pointer;" />
+                            <p style="font-size: 0.8rem; color: #666; margin-top: 0.5rem; font-style: italic;">Click to enlarge - Post-incident review template</p>
+                        </div>
+                    </div>
+
+                    <div class="background-section fragment fade-up">
+                        <h3>⏰ Schedule Reviews Early</h3>
+                        <p>Schedule reviews <strong>as early as possible</strong> so no context is missed while details are still fresh in everyone's memory.</p>
+                    </div>
+
+                    <div class="background-section fragment fade-up">
+                        <h3>👥 Involve All Parties</h3>
+                        <p>Ensure <strong>all stakeholders</strong> who were involved in the incident participate in the review process for complete perspective.</p>
+                    </div>
+
+                    <div class="background-section fragment fade-up">
+                        <h3>🎫 Create JIRA Action Items</h3>
+                        <p>Create JIRA tickets for <strong>all post-incident review action items</strong> using priority-based tags:</p>
+                        
+                        <div style="margin: 1rem 0;">
+                            <div style="background: #fee2e2; padding: 0.6rem; border-radius: 6px; margin: 0.4rem 0; border-left: 4px solid #dc2626;">
+                                <code style="font-weight: bold; color: #dc2626; font-size: 0.8rem;">p0-post-incident-review-action-item</code>
+                                <span style="margin-left: 1rem; font-size: 0.75rem; color: #666;">Critical priority</span>
+                            </div>
+                            <div style="background: #fef3c7; padding: 0.6rem; border-radius: 6px; margin: 0.4rem 0; border-left: 4px solid #f59e0b;">
+                                <code style="font-weight: bold; color: #f59e0b; font-size: 0.8rem;">p1-post-incident-review-action-item</code>
+                                <span style="margin-left: 1rem; font-size: 0.75rem; color: #666;">High priority</span>
+                            </div>
+                            <div style="background: #f0f9ff; padding: 0.6rem; border-radius: 6px; margin: 0.4rem 0; border-left: 4px solid #3b82f6;">
+                                <code style="font-weight: bold; color: #3b82f6; font-size: 0.8rem;">p2-post-incident-review-action-item</code>
+                                <span style="margin-left: 1rem; font-size: 0.75rem; color: #666;">Medium priority</span>
+                            </div>
+                        </div>
+                        
+                        <div style="margin: 1.5rem 0; text-align: center;">
+                            <img src="action-items.png" 
+                                 alt="JIRA Action Items Example" 
+                                 class="clickable-image" 
+                                 style="width: 600px; height: auto; border: 1px solid #ddd; border-radius: 8px; cursor: pointer;" />
+                            <p style="font-size: 0.8rem; color: #666; margin-top: 0.5rem; font-style: italic;">Click to enlarge - JIRA action items with priority tags</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Q&A -->
+            <section class="title-slide" data-menu-title="Q&A">
+                <div style="width: 100%; max-width: 800px; margin: 0 auto; padding-top: 4rem; text-align: center;">
+                    <h1 style="color: white; margin: 0 0 2rem 0; font-size: 4rem;">
+                        Q&A
+                    </h1>
+                    <h3 style="color: rgba(255,255,255,0.9); font-weight: 400; margin-bottom: 3rem;">Questions & Discussion</h3>
+                    <p style="color: rgba(255,255,255,0.8); font-size: 1.2em; font-weight: 300;">
+                        Thank you for your attention
+                    </p>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/reveal.min.js"></script>
+    <script>
+        Reveal.initialize({
+            hash: true,
+            transition: 'fade',
+            transitionSpeed: 'default',
+            backgroundTransition: 'fade',
+            controls: true,
+            progress: true,
+            center: false,
+            touch: true,
+            fragments: true,
+            embedded: false,
+            help: true,
+            mouseWheel: false,
+            hideInactiveCursor: true,
+            hideCursorTime: 5000,
+            previewLinks: false,
+            viewDistance: 3,
+            mobileViewDistance: 2,
+            width: '100%',
+            height: '100%',
+            margin: 0.02,
+            minScale: 0.2,
+            maxScale: 2.0,
+            
+            // Enhanced Navigation Features
+            slideNumber: 'c/t', // Shows current/total slide numbers
+            showSlideNumber: 'all',
+            
+            // Keyboard shortcuts
+            keyboard: {
+                39: 'next', // right arrow
+                37: 'prev', // left arrow
+                40: 'next', // down arrow
+                38: 'prev', // up arrow
+                32: 'next', // space
+                27: function() { // ESC key - toggle overview
+                    if (Reveal.isOverview()) {
+                        Reveal.toggleOverview();
+                    } else {
+                        Reveal.toggleOverview();
+                    }
+                },
+                71: function() { // G key - go to slide
+                    let slideNumber = prompt('Go to slide number:');
+                    if (slideNumber && !isNaN(slideNumber)) {
+                        Reveal.slide(parseInt(slideNumber) - 1);
+                    }
+                },
+                77: function() { // M key - toggle menu
+                    toggleCustomMenu();
+                }
+            }
+        });
+        
+        // Custom menu functionality
+        let isMenuOpen = false;
+        
+        // Slide titles for navigation
+        const slideData = [
+            { title: 'The 25th hour and beyond', section: 0 },
+            { title: 'Agenda', section: 1 },
+            { title: 'Background', section: 2 },
+            { title: 'Measures taken', section: 3 },
+            { title: 'How Clients got affected?', section: 4 },
+            { title: 'Incident timeline', section: 5 },
+            { title: 'Incident commander role', section: 6 },
+            { title: 'Post incident reviews', section: 7 },
+            { title: 'Q&A', section: 8 }
+        ];
+        
+        function toggleCustomMenu() {
+            const menu = document.getElementById('customMenu');
+            const overlay = document.getElementById('menuOverlay');
+            
+            isMenuOpen = !isMenuOpen;
+            
+            if (isMenuOpen) {
+                menu.classList.add('open');
+                overlay.classList.add('active');
+            } else {
+                menu.classList.remove('open');
+                overlay.classList.remove('active');
+            }
+        }
+        
+        function closeMenu() {
+            const menu = document.getElementById('customMenu');
+            const overlay = document.getElementById('menuOverlay');
+            
+            isMenuOpen = false;
+            menu.classList.remove('open');
+            overlay.classList.remove('active');
+        }
+        
+        function updateActiveMenuItem() {
+            const currentSlide = Reveal.getIndices().h;
+            const menuItems = document.querySelectorAll('.menu-item');
+            
+            menuItems.forEach((item, index) => {
+                if (index === currentSlide) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize lightbox functionality
+            function initializeLightbox() {
+                // Create lightbox element
+                const lightbox = document.createElement('div');
+                lightbox.className = 'lightbox';
+                lightbox.innerHTML = `
+                    <span class="lightbox-close">&times;</span>
+                    <img class="lightbox-content" src="" alt="">
+                `;
+                document.body.appendChild(lightbox);
+
+                // Add click listeners to all clickable images
+                document.addEventListener('click', function(e) {
+                    if (e.target.classList.contains('clickable-image')) {
+                        lightbox.querySelector('.lightbox-content').src = e.target.src;
+                        lightbox.classList.add('active');
+                    }
+                });
+
+                // Close lightbox functionality
+                lightbox.addEventListener('click', function(e) {
+                    if (e.target === lightbox || e.target.classList.contains('lightbox-close')) {
+                        lightbox.classList.remove('active');
+                    }
+                });
+
+                // ESC key to close
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && lightbox.classList.contains('active')) {
+                        lightbox.classList.remove('active');
+                    }
+                });
+            }
+
+            initializeLightbox();
+
+            // Initialize custom menu
+            const menuItems = document.getElementById('menuItems');
+            
+            slideData.forEach((slide, index) => {
+                const li = document.createElement('li');
+                li.className = 'menu-item';
+                li.innerHTML = `
+                    <span class="slide-number-badge">${index + 1}</span>
+                    <span>${slide.title}</span>
+                `;
+                
+                li.addEventListener('click', function() {
+                    Reveal.slide(index);
+                    closeMenu();
+                });
+                
+                menuItems.appendChild(li);
+            });
+            
+            // Menu toggle functionality
+            document.getElementById('menuToggle').addEventListener('click', toggleCustomMenu);
+            document.getElementById('menuOverlay').addEventListener('click', closeMenu);
+            
+            // Update active menu item on slide change
+            Reveal.on('slidechanged', updateActiveMenuItem);
+
+            // Fragment highlighting and auto-scroll
+            Reveal.on('fragmentshown', function(event) {
+                if (event.fragment.classList.contains('timeline-event')) {
+                    // Remove current-fragment from all timeline events
+                    document.querySelectorAll('.timeline-event.current-fragment').forEach(el => {
+                        el.classList.remove('current-fragment');
+                    });
+                    // Add current-fragment to the shown event
+                    event.fragment.classList.add('current-fragment');
+                }
+                
+                // Auto-scroll for any fragment (timeline events or background sections)
+                if (event.fragment.classList.contains('timeline-event') || 
+                    event.fragment.classList.contains('background-section')) {
+                    setTimeout(function() {
+                        const rect = event.fragment.getBoundingClientRect();
+                        const headerHeight = 80; // Account for fixed header
+                        const isVisible = rect.top >= headerHeight && rect.bottom <= window.innerHeight;
+                        
+                        if (!isVisible) {
+                            event.fragment.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'center',
+                                inline: 'nearest'
+                            });
+                        }
+                    }, 100); // Small delay to ensure animation has started
+                }
+            });
+
+            Reveal.on('fragmenthidden', function(event) {
+                if (event.fragment.classList.contains('timeline-event')) {
+                    event.fragment.classList.remove('current-fragment');
+                }
+            });
+            
+            // Initial update
+            setTimeout(updateActiveMenuItem, 100);
+            
+            // Create help button
+            const helpButton = document.createElement('div');
+            helpButton.innerHTML = '?';
+            helpButton.style.cssText = `
+                position: fixed;
+                bottom: 80px;
+                right: 20px;
+                z-index: 1001;
+                font-size: 16px;
+                cursor: pointer;
+                color: var(--babbel-orange);
+                background: white;
+                border: 1px solid var(--babbel-orange);
+                border-radius: 50%;
+                width: 35px;
+                height: 35px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 2px 12px rgba(255, 102, 0, 0.15);
+                font-weight: bold;
+                transition: all 0.3s ease;
+                opacity: 0.9;
+            `;
+            
+            helpButton.addEventListener('mouseover', function() {
+                this.style.transform = 'translateY(-2px)';
+                this.style.opacity = '1';
+                this.style.boxShadow = '0 4px 16px rgba(255, 102, 0, 0.3)';
+            });
+            
+            helpButton.addEventListener('mouseout', function() {
+                this.style.transform = 'translateY(0)';
+                this.style.opacity = '0.9';
+                this.style.boxShadow = '0 2px 12px rgba(255, 102, 0, 0.15)';
+            });
+            
+            // Add responsive class for help button
+            function updateHelpButtonPosition() {
+                if (window.innerWidth <= 768) {
+                    helpButton.classList.add('help-button-mobile');
+                } else {
+                    helpButton.classList.remove('help-button-mobile');
+                }
+            }
+            
+            // Initial check and resize listener
+            updateHelpButtonPosition();
+            window.addEventListener('resize', updateHelpButtonPosition);
+            
+            helpButton.addEventListener('click', function() {
+                alert(`Navigation Help:
+                
+📱 Basic Navigation:
+• Arrow Keys / Space - Next/Previous slide
+• ESC - Overview mode (see all slides)
+• G - Go to specific slide number
+• M - Toggle menu (hamburger icon top-left)
+• ? - Show this help
+
+🖱️ Mouse/Touch:
+• Click arrows in bottom-right
+• Swipe left/right on mobile
+• Click menu items to jump to slides
+• Click on overview thumbnails
+
+📊 Slide Numbers:
+• Bottom-right shows current/total slides
+• Menu shows slide numbers for easy reference
+
+💡 Pro Tips:
+• Use Overview mode (ESC) for visual navigation
+• Menu shows all slides with numbers
+• G key lets you type slide number to jump to
+• Menu highlights your current slide`);
+            });
+            
+            document.body.appendChild(helpButton);
+        });
+
+    </script>
+</body>
+</html>
