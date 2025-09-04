@@ -409,6 +409,20 @@
             margin-top: 1.5rem;
         }
 
+        .background-grid-two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .background-grid-two-column {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+        }
+
         /* Image lightbox functionality */
         .clickable-image {
             cursor: pointer;
@@ -1074,7 +1088,7 @@
                     <!--<h3 style="color: rgba(255,255,255,0.9); font-weight: 400; text-align: center; margin-top: 0;">Incident Management Post-Mortem</h3>-->
                     <p style="color: rgba(255,255,255,0.8); font-size: 1.2em; margin-top: 3rem; font-weight: 300; text-align: center;">
                         Sep 10, 2025<br>
-                        <span style="font-size: 0.9em;">Presented by: Identity</span>
+                        <span style="font-size: 0.9em;">Presented by: Identity team</span>
                     </p>
                 </div>
             </section>
@@ -1196,7 +1210,7 @@
                     <p class="section-subtitle" style="font-size: 1.2rem;">Pre-release preparation and lessons learned</p>
                 </div>
                 
-                <div class="background-grid">
+                <div class="background-grid-two-column">
                     <div class="background-section fragment fade-up">
                         <h3>✅ Pre-Release Actions Taken</h3>
                         <ul style="margin: 0; padding-left: 1.2rem;">
@@ -1399,16 +1413,51 @@
 
                     <div class="background-section fragment fade-up">
                         <h3>📊 Impact Calculation</h3>
-                        <p>Calculate the impact using the formula:</p>
-                        <div style="background: #f8f9fa; padding: 1rem; border-radius: 6px; margin: 1rem 0; text-align: center;">
-                            <strong style="font-size: 1.1rem; color: var(--babbel-dark-orange);">
-                                (Affected Users / Daily Active Users) × 100
-                            </strong>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 1rem;">
+                            <!-- Left Column: Formula and Process -->
+                            <div>
+                                <h4 style="color: var(--babbel-dark-orange); font-size: 1.1rem; margin: 0 0 1rem 0;">Formula & Data Sources</h4>
+                                <p style="margin-bottom: 1rem;">Calculate the impact using the formula:</p>
+                                <div style="background: #f8f9fa; padding: 1rem; border-radius: 6px; margin: 1rem 0; text-align: center;">
+                                    <strong style="font-size: 1.1rem; color: var(--babbel-dark-orange);">
+                                        (Affected Users / Daily Active Users) × 100
+                                    </strong>
+                                </div>
+                                <ul style="margin: 1rem 0; padding-left: 1.2rem; font-size: 1rem;">
+                                    <li style="margin: 0.4rem 0;"><strong>Affected users:</strong> Retrieved from logs, events, or Rollbar occurrences</li>
+                                    <li style="margin: 0.4rem 0;"><strong>Daily active users:</strong> Retrieved from Amplitude analytics</li>
+                                </ul>
+                            </div>
+                            
+                            <!-- Right Column: Real Example -->
+                            <div>
+                                <h4 style="color: var(--babbel-dark-orange); font-size: 1.1rem; margin: 0 0 1rem 0;">Current Incident Example</h4>
+                                
+                                <div style="background: #fff9f3; border-left: 4px solid var(--babbel-orange); padding: 1rem; border-radius: 6px; margin-bottom: 1rem;">
+                                    <h5 style="margin: 0 0 0.5rem 0; color: var(--babbel-dark-orange);">📊 Rollbar Query (RQL)</h5>
+                                    <div style="background: #f1f1f1; padding: 0.5rem; border-radius: 4px; font-family: monospace; font-size: 0.85rem; margin-bottom: 0.5rem;">
+                                        SELECT count_distinct(person.id)<br>
+                                        FROM item_occurrence<br>
+                                        WHERE item.counter = 24726
+                                    </div>
+                                    <p style="margin: 0; font-size: 0.9rem;"><strong>Affected Users:</strong> 5,420</p>
+                                </div>
+                                
+                                <div style="background: #f3f7ff; border-left: 4px solid #2196F3; padding: 1rem; border-radius: 6px; margin-bottom: 1rem;">
+                                    <h5 style="margin: 0 0 0.5rem 0; color: #1976D2;">📈 Amplitude Data</h5>
+                                    <p style="margin: 0; font-size: 0.9rem;"><strong>Total DAU:</strong> 347,492</p>
+                                </div>
+                                
+                                <div style="background: #fff3f3; border-left: 4px solid #dc2626; padding: 1rem; border-radius: 6px;">
+                                    <h5 style="margin: 0 0 0.5rem 0; color: #dc2626;">🎯 Impact Calculation</h5>
+                                    <div style="font-family: monospace; font-size: 0.9rem; margin-bottom: 0.5rem;">
+                                        5,420 ÷ 347,492 × 100 = <strong style="color: #dc2626;">1.56%</strong>
+                                    </div>
+                                    <p style="margin: 0; font-size: 0.85rem; color: #666;">~1.6% of daily active users affected</p>
+                                </div>
+                            </div>
                         </div>
-                        <ul style="margin: 1rem 0; padding-left: 1.2rem; font-size: 1.2rem;">
-                            <li style="margin: 0.4rem 0;"><strong>Affected users:</strong> Retrieved from logs, events, or Rollbar occurrences</li>
-                            <li style="margin: 0.4rem 0;"><strong>Daily active users:</strong> Retrieved from Amplitude analytics</li>
-                        </ul>
                         
                         <div style="margin: 1.5rem 0; text-align: center;">
                             <img src="impact-analysis.png" 
