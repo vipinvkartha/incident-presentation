@@ -1086,6 +1086,10 @@
                 </div>
                 <div class="agenda-list">
                     <div class="agenda-item">
+                        <span class="agenda-icon">👋</span>
+                        <span class="agenda-text">Introduction</span>
+                    </div>
+                    <div class="agenda-item">
                         <span class="agenda-icon">📋</span>
                         <span class="agenda-text">Background</span>
                     </div>
@@ -1112,6 +1116,36 @@
                     <div class="agenda-item">
                         <span class="agenda-icon">❓</span>
                         <span class="agenda-text">Q&A</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Introduction -->
+            <section data-transition="fade" data-menu-title="Introduction">
+                <div class="section-header">
+                    <h2 style="font-size: 2rem;">Introduction</h2>
+                    <p class="section-subtitle" style="font-size: 1.2rem;">Setting the context for our incident management session</p>
+                </div>
+                
+                <div class="background-grid">
+                    <div class="background-section fragment fade-up">
+                        <h3>👋 Welcome to our Post-Mortem Session</h3>
+                        <p>Today we'll be discussing a recent incident that occurred in our production environment, examining what happened, how we responded, and what we learned.</p>
+                    </div>
+
+                    <div class="background-section fragment fade-up">
+                        <h3>🎯 Session Objectives</h3>
+                        <ul style="margin: 1rem 0; padding-left: 1.2rem; font-size: 1.2rem;">
+                            <li style="margin: 0.6rem 0; line-height: 1.4;">Share the complete incident timeline and root cause analysis</li>
+                            <li style="margin: 0.6rem 0; line-height: 1.4;">Discuss lessons learned and prevention strategies</li>
+                            <li style="margin: 0.6rem 0; line-height: 1.4;">Review incident commander responsibilities and processes</li>
+                            <li style="margin: 0.6rem 0; line-height: 1.4;">Improve our collective incident response capabilities</li>
+                        </ul>
+                    </div>
+
+                    <div class="background-section fragment fade-up">
+                        <h3>📚 What We'll Cover</h3>
+                        <p>This session will take you through our incident management journey, from the initial deployment that triggered the issue to the post-incident review process that helps us continuously improve.</p>
                     </div>
                 </div>
             </section>
@@ -1553,13 +1587,14 @@
         const slideData = [
             { title: 'The 25th hour and beyond', section: 0 },
             { title: 'Agenda', section: 1 },
-            { title: 'Background', section: 2 },
-            { title: 'Measures taken', section: 3 },
-            { title: 'How Clients got affected?', section: 4 },
-            { title: 'Incident timeline', section: 5 },
-            { title: 'Incident commander role', section: 6 },
-            { title: 'Post incident reviews', section: 7 },
-            { title: 'Q&A', section: 8 }
+            { title: 'Introduction', section: 2 },
+            { title: 'Background', section: 3 },
+            { title: 'Measures taken', section: 4 },
+            { title: 'How Clients got affected?', section: 5 },
+            { title: 'Incident timeline', section: 6 },
+            { title: 'Incident commander role', section: 7 },
+            { title: 'Post incident reviews', section: 8 },
+            { title: 'Q&A', section: 9 }
         ];
         
         function toggleCustomMenu() {
