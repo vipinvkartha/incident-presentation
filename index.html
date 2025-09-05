@@ -421,6 +421,65 @@
                 grid-template-columns: 1fr;
                 gap: 1.5rem;
             }
+            
+            /* Intro section responsive layout */
+            .background-section div[style*="grid-template-columns: 2fr 1fr"] {
+                display: block !important;
+            }
+            
+            .background-section div[style*="grid-template-columns: 2fr 1fr"] > div:last-child {
+                margin-top: 1.5rem;
+                text-align: center;
+            }
+            
+            .background-section div[style*="grid-template-columns: 1fr 2fr"] {
+                display: block !important;
+            }
+            
+            .background-section div[style*="grid-template-columns: 1fr 2fr"] > div:first-child {
+                margin-bottom: 1.5rem;
+                text-align: center;
+            }
+            
+            /* Scale down fonts slightly on mobile for better fit */
+            .background-section h3[style*="font-size: 1.8rem"] {
+                font-size: 1.5rem !important;
+            }
+            
+            .background-section h4[style*="font-size: 1.3rem"],
+            .background-section h4[style*="font-size: 1.5rem"] {
+                font-size: 1.1rem !important;
+            }
+            
+            .background-section p[style*="font-size: 1.3rem"],
+            .background-section p[style*="font-size: 1.5rem"],
+            .background-section p[style*="font-size: 1.6rem"] {
+                font-size: 1.1rem !important;
+            }
+            
+            .background-section ul[style*="font-size: 1.6rem"] {
+                font-size: 1.2rem !important;
+            }
+            
+            .background-section div[style*="font-size: 1.8rem"] {
+                font-size: 1.4rem !important;
+            }
+            
+            /* Conclusion slide responsive layout */
+            .background-section div[style*="grid-template-columns: 1fr 1fr"] {
+                display: block !important;
+            }
+            .background-section div[style*="grid-template-columns: 1fr 1fr"] > div {
+                margin-bottom: 1.5rem;
+            }
+            
+            /* Responsive styling for highlighted conclusion message */
+            .background-section p[style*="font-size: 2.2rem"] {
+                font-size: 1.8rem !important;
+            }
+            .background-section div[style*="padding: 3rem 2rem"] {
+                padding: 2rem 1rem !important;
+            }
         }
 
         /* Image lightbox functionality */
@@ -574,6 +633,7 @@
         .timeline-dot.incident { background: #8b5cf6; }
         .timeline-dot.fix { background: #06b6d4; }
         .timeline-dot.resolution { background: #059669; }
+        .timeline-dot.process { background: #3b82f6; }
 
         .timeline-time {
             font-weight: 600;
@@ -1049,7 +1109,7 @@
 <body>
     <!-- Babbel Header -->
     <div class="babbel-header">
-        <img src="logo.png" alt="Babbel Logo" class="babbel-logo"/>
+        <img src="images/logo.png" alt="Babbel Logo" class="babbel-logo"/>
         
         <!-- Menu Toggle Button -->
         <div class="menu-toggle" id="menuToggle">
@@ -1074,9 +1134,9 @@
             
             <!-- Title Slide -->
             <section class="title-slide" data-menu-title="Title">
-                <div style="width: 100%; max-width: 800px; margin: 0 auto; padding-top: 4rem;">
+                <div style="width: 100%; max-width: 800px; margin: 0 auto; padding-top: 12rem;">
                     <h1 style="color: white; margin-bottom: 2rem; text-align: center; margin-top: 0;">
-                        The 25th hour and beyond
+                        🕒 The 25th hour and beyond
                     </h1>
                     <!--<h3 style="color: rgba(255,255,255,0.9); font-weight: 400; text-align: center; margin-top: 0;">Incident Management Post-Mortem</h3>-->
                     <p style="color: rgba(255,255,255,0.8); font-size: 1.2em; margin-top: 3rem; font-weight: 300; text-align: center;">
@@ -1089,7 +1149,7 @@
             <!-- Agenda -->
             <section data-transition="fade" data-menu-title="Agenda">
                 <div class="section-header">
-                    <h2 style="font-size: 2rem;">Agenda</h2>
+                    <h2 style="font-size: 2rem;">📋 Agenda</h2>
                 </div>
                 <div class="agenda-list">
                     <div class="agenda-item">
@@ -1121,38 +1181,94 @@
                         <span class="agenda-text">Post incident reviews</span>
                     </div>
                     <div class="agenda-item">
-                        <span class="agenda-icon">❓</span>
-                        <span class="agenda-text">Q&A</span>
+                        <span class="agenda-icon">🔑</span>
+                        <span class="agenda-text">Key Learnings & Conclusion</span>
+                    </div>
+                    <div class="agenda-item">
+                        <span class="agenda-icon"></span>
+                        <span class="agenda-text">Q&A ❓</span>
                     </div>
                 </div>
             </section>
 
-            <!-- Introduction -->
-            <section data-transition="fade" data-menu-title="Introduction">
+            <!-- Why We're Here Today -->
+            <section data-transition="fade" data-menu-title="Why We're Here Today" data-auto-animate>
                 <div class="section-header">
-                    <h2 style="font-size: 2rem;">Introduction</h2>
-                    <p class="section-subtitle" style="font-size: 1.2rem;">Setting the context for our incident management session</p>
+                    <h2 style="font-size: 2rem;" data-auto-animate-id="main-heading">🎯 Why We're Here Today</h2>
+                    <p class="section-subtitle" style="font-size: 1.2rem;" data-auto-animate-id="subtitle">Setting the context for our incident management session</p>
                 </div>
                 
                 <div class="background-grid">
-                    <div class="background-section fragment fade-up">
-                        <h3>👋 Welcome to our Post-Mortem Session</h3>
-                        <p>Today we'll be discussing a recent incident that occurred in our production environment, examining what happened, how we responded, and what we learned.</p>
+                    <div class="background-section" style="padding: 3rem;">
+                        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 4rem; align-items: center;">
+                            <div>
+                                <ul style="margin: 2rem 0; padding-left: 2rem; font-size: 1.6rem;">
+                                    <li style="margin: 1rem 0; line-height: 1.8;"><strong>LEAP all hands</strong> - Lesson incident as an alert management example, but we didn't have time for the full story</li>
+                                    <li style="margin: 1rem 0; line-height: 1.8;"><strong>You had questions</strong> - The community wanted to understand more</li>
+                                    <li style="margin: 1rem 0; line-height: 1.8;"><strong>The Incident Management Steering Group</strong> saw this as the perfect learning opportunity</li>
+                                    <li style="margin: 1rem 0; line-height: 1.8;"><strong>Today we dive deeper</strong> - What really happened, how we responded, and what we learned</li>
+                                </ul>
+                            </div>
+                            <div style="text-align: center;">
+                                <img src="images/intro1.png" 
+                                     alt="Introduction Visual" 
+                                     style="width: 100%; max-width: 400px; height: auto; border-radius: 12px;" />
+                            </div>
+                        </div>
+                        
+                        <div style="background: #f0f9ff; border-left: 8px solid #3b82f6; padding: 2.5rem; border-radius: 12px; margin: 3rem 0; text-align: center;">
+                            <p style="margin: 0; font-size: 1.8rem; color: #1976D2; line-height: 1.8; font-weight: 500;">
+                                This isn't just about one incident.<br>
+                                <strong>It's about growing stronger together.</strong>
+                            </p>
+                        </div>
                     </div>
+                </div>
+            </section>
 
-                    <div class="background-section fragment fade-up">
-                        <h3>🎯 Session Objectives</h3>
-                        <ul style="margin: 1rem 0; padding-left: 1.2rem; font-size: 1.2rem;">
-                            <li style="margin: 0.6rem 0; line-height: 1.4;">Share the complete incident timeline and root cause analysis</li>
-                            <li style="margin: 0.6rem 0; line-height: 1.4;">Discuss lessons learned and prevention strategies</li>
-                            <li style="margin: 0.6rem 0; line-height: 1.4;">Review incident commander responsibilities and processes</li>
-                            <li style="margin: 0.6rem 0; line-height: 1.4;">Improve our collective incident response capabilities</li>
-                        </ul>
-                    </div>
+            <!-- Learning Together from Our Failures -->
+            <section data-transition="fade" data-menu-title="Learning Together" data-auto-animate>
+                <div class="section-header">
+                    <h2 style="font-size: 2rem;" data-auto-animate-id="main-heading">🌱 Learning Together from Our Failures</h2>
+                    <p class="section-subtitle" style="font-size: 1.2rem;" data-auto-animate-id="subtitle">Building a culture where vulnerability creates strength</p>
+                </div>
+                
+                <div class="background-grid">
+                    <div class="background-section" style="padding: 3rem;">
+                        <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 4rem; align-items: center;">
+                            <div style="text-align: center;">
+                                <img src="images/intro2.png" 
+                                     alt="Learning Together Visual" 
+                                     style="width: 100%; max-width: 400px; height: auto; border-radius: 12px;" />
+                            </div>
+                            <div>
+                                <p style="margin: 2rem 0; font-size: 1.5rem; color: #666; font-style: italic; line-height: 1.8;">
+                                    We all make mistakes - that's human. <strong>The real mistake is not learning from it.</strong>
+                                </p>
+                                
+                                <div style="margin: 2.5rem 0;">
+                                    <h4 style="color: var(--babbel-dark-orange); font-size: 1.5rem; margin: 0 0 1rem 0;">What we're building:</h4>
+                                    <p style="margin: 0 0 2rem 0; font-size: 1.5rem; line-height: 1.8;">A company where sharing our failures feels <strong>safe, not scary</strong></p>
+                                </div>
 
-                    <div class="background-section fragment fade-up">
-                        <h3>📚 What We'll Cover</h3>
-                        <p>This session will take you through our incident management journey, from the initial deployment that triggered the issue to the post-incident review process that helps us continuously improve.</p>
+                                <div style="margin: 2.5rem 0;">
+                                    <p style="margin: 0.8rem 0; font-size: 1.5rem; line-height: 1.8;">• Because your struggle today could save someone else tomorrow</p>
+                                    <p style="margin: 0.8rem 0; font-size: 1.5rem; line-height: 1.8;">• Because together, we learn faster than alone</p>
+                                </div>
+
+                                <div style="margin: 2.5rem 0;">
+                                    <h4 style="color: var(--babbel-dark-orange); font-size: 1.5rem; margin: 0 0 1rem 0;">How we're doing it:</h4>
+                                    <p style="margin: 0.8rem 0; font-size: 1.5rem; line-height: 1.8;">• 25th hour conversations</p>
+                                    <p style="margin: 0.8rem 0; font-size: 1.5rem; line-height: 1.8;">• BIMP Incident Reviews</p>
+                                </div>
+
+                                <div style="background: #fff9f3; border-left: 8px solid var(--babbel-orange); padding: 2rem; border-radius: 12px; margin: 2rem 0;">
+                                    <p style="margin: 0; font-size: 1.4rem; color: var(--babbel-dark-orange); line-height: 1.8; font-weight: 500;">
+                                        <strong>The foundation we need:</strong> Trust that vulnerability makes us stronger, not weaker
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -1160,11 +1276,35 @@
             <!-- Background -->
             <section data-transition="fade" data-menu-title="Background">
                 <div class="section-header">
-                    <h2 style="font-size: 2rem;">Background</h2>
+                    <h2 style="font-size: 2rem;">📚 Background</h2>
                     <p class="section-subtitle" style="font-size: 1.2rem;">Business requirement and technical implementation</p>
                 </div>
                 
                 <div class="background-grid">
+                    <div class="background-section fragment fade-up">
+                        <h3>🚨 The Issue</h3>
+                        <p><strong>Lesson completions not registering on Web app</strong></p>
+                        
+                        <div style="background: #f0f9ff; border-left: 4px solid #3b82f6; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <div style="display: flex; align-items: center; margin-bottom: 0.5rem;">
+                                <span style="color: #1976D2; font-size: 1rem; margin-right: 0.5rem;">🎫</span>
+                                <strong style="color: #1976D2; font-size: 1rem;">JIRA Ticket</strong>
+                            </div>
+                            <p style="margin: 0; font-size: 1.1rem;">
+                                <a href="https://babbel.atlassian.net/browse/BIM-4051" 
+                                   class="timeline-link" 
+                                   target="_blank" 
+                                   style="color: #1976D2; text-decoration: none; font-family: monospace;">
+                                    BIM-4051 🔗
+                                </a>
+                            </p>
+                        </div>
+                        
+                        <p style="margin-top: 1rem; font-size: 1.2rem; color: #666;">
+                            Some requests to lesson finish failed with 401. As a result learners don’t have their completion registered in the backend and ‘lesson:completed’ event is not emitted.
+                        </p>
+                    </div>
+
                     <div class="background-section fragment fade-up">
                         <h3>💼 Why Session Management?</h3>
                         <p>Our B2B team received a request from a potential enterprise customer for <strong>single sign-out functionality</strong>. This required implementing session management infrastructure as a foundational component in Babbel.</p>
@@ -1186,11 +1326,16 @@
                                 <div class="code-label">New Format:</div>
                                 X-Babbel-User-Arn: arn:aws:sts::&lt;AWS_ACCOUNT_ID&gt;:assumed-role/&lt;ROLE_NAME&gt;/account.uuid<strong>@session_id</strong>
                             </div>
-                        </div>
-                        
-                        <div style="margin: 1.2rem 0;">
-                            <h4 style="color: var(--babbel-dark-orange); font-size: 1.1rem; margin: 0 0 0.5rem 0;">2. Replaced authentication token with session token</h4>
-                            <p style="font-size: 1.2rem; margin: 0; color: #666;">Updated <code>users/me</code> endpoint to use session tokens instead of authentication tokens for enhanced session management.</p>
+                            
+                            <div style="background: #fff8e1; border-left: 4px solid #ff9800; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                                <div style="display: flex; align-items: center; margin-bottom: 0.3rem;">
+                                    <span style="color: #e65100; font-size: 1rem; margin-right: 0.5rem;">⚠️</span>
+                                    <strong style="color: #e65100; font-size: 1rem;">Key Learning</strong>
+                                </div>
+                                <p style="margin: 0; font-size: 1.1rem; color: #e65100; line-height: 1.4;">
+                                    We didn't know about all the clients using this header. It is <strong>critical to maintain visibility</strong> of all our API consumers and dependencies.
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1199,7 +1344,7 @@
             <!-- Measures taken -->
             <section data-transition="fade" data-menu-title="Measures taken">
                 <div class="section-header">
-                    <h2 style="font-size: 2rem;">Measures taken</h2>
+                    <h2 style="font-size: 2rem;">🛡️ Measures taken</h2>
                     <p class="section-subtitle" style="font-size: 1.2rem;">Pre-release preparation and lessons learned</p>
                 </div>
                 
@@ -1207,8 +1352,8 @@
                     <div class="background-section fragment fade-up">
                         <h3>✅ Pre-Release Actions Taken</h3>
                         <ul style="margin: 0; padding-left: 1.2rem;">
-                            <li style="margin: 0.6rem 0; font-size: 1.2rem; line-height: 1.4;">Communicated breaking changes via <code>#developers</code> channel with advance notice</li>
-                            <li style="margin: 0.6rem 0; font-size: 1.2rem; line-height: 1.4;">Extended <strong>staging environment testing period to 10 days</strong> for validation</li>
+                            <li style="margin: 0.6rem 0; font-size: 1.2rem; line-height: 1.4;">Communicated breaking changes via <code>#developers</code> channel</li>
+                            <li style="margin: 0.6rem 0; font-size: 1.2rem; line-height: 1.4;">Deployed changes in staging for 10 days</strong> for validation</li>
                             <li style="margin: 0.6rem 0; font-size: 1.2rem; line-height: 1.4;">Conducted comprehensive manual search across GitHub repositories to identify affected clients</li>
                         </ul>
                     </div>
@@ -1216,9 +1361,9 @@
                     <div class="background-section fragment fade-up">
                         <h3>🔄 Areas for Improvement</h3>
                         <ul style="margin: 0; padding-left: 1.2rem;">
-                            <li style="margin: 0.6rem 0; font-size: 1.2rem; line-height: 1.4;"><strong>Enhanced communication strategy</strong> required - single notification insufficient for broad reach</li>
-                            <li style="margin: 0.6rem 0; font-size: 1.2rem; line-height: 1.4;"><strong>Insufficient observability tooling</strong> - no systematic approach to identify client dependencies</li>
-                            <li style="margin: 0.6rem 0; font-size: 1.2rem; line-height: 1.4;"><strong>Missing automated testing framework</strong> for detecting breaking changes in staging environment</li>
+                            <li style="margin: 0.6rem 0; font-size: 1.2rem; line-height: 1.4;"><strong>Better communication strategy</strong> required - single notification insufficient for broad reach</li>
+                            <li style="margin: 0.6rem 0; font-size: 1.2rem; line-height: 1.4;"><strong>Insufficient observability tooling</strong> - no easy way to identify client dependencies</li>
+                            <li style="margin: 0.6rem 0; font-size: 1.2rem; line-height: 1.4;"><strong>Missing automated tests</strong></li>
                         </ul>
                     </div>
                 </div>
@@ -1227,7 +1372,7 @@
             <!-- How Clients got affected -->
             <section data-transition="fade" data-menu-title="How Clients got affected?">
                 <div class="section-header">
-                    <h2 style="font-size: 2rem;">How Clients got affected?</h2>
+                    <h2 style="font-size: 2rem;">💥 How Clients got affected?</h2>
                     <p class="section-subtitle" style="font-size: 1.2rem;">Understanding the authentication failure mechanism</p>
                 </div>
                 
@@ -1239,14 +1384,30 @@
 
                     <div class="background-section fragment fade-up">
                         <h3>💥 What Went Wrong</h3>
-                        <p>Authentication <strong>failed</strong> because the format changed in the <code>user-arn-header</code>. Clients were still expecting the old format and couldn't parse the UUID correctly from the new format with the appended session ID.</p>
+                        <p>Authentication <strong>failed</strong> because the format changed in the <code>user-arn-header</code>. Clients need to be updated to handle the new format with the appended session ID.</p>
                         
                         <div style="margin-top: 1.5rem; padding: 1rem; background: #fff3f3; border-left: 4px solid #dc2626; border-radius: 6px;">
                             <div style="display: flex; align-items: center; margin-bottom: 0.5rem;">
                                 <span style="color: #dc2626; font-size: 1.2rem; margin-right: 0.5rem;">⚠️</span>
                                 <strong style="color: #dc2626;">Impact</strong>
                             </div>
-                            <p style="margin: 0; font-size: 1.2rem; color: #666;">Client applications could no longer extract and validate user UUIDs, causing authentication to fail across multiple services.</p>
+                            <p style="margin: 0; font-size: 1.2rem; color: #666;">Authentication failed for clients who were not updated to handle the new format with the appended session ID.</p>
+                        </div>
+                    </div>
+
+                    <div class="background-section fragment fade-up">
+                        <h3>🔧 Actual Impact</h3>
+                        <p>One of the service was not updated to handle the new user-arn header format:</p>
+                        
+                        <div style="background: #fef2f2; border-left: 4px solid #ef4444; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <h4 style="color: #dc2626; font-size: 1.1rem; margin: 0 0 0.5rem 0; font-family: monospace;">
+                                🚨 lesson-finishes-coordinator.microverse
+                            </h4>
+                            <ul style="margin: 0.5rem 0; padding-left: 1.2rem; font-size: 1.2rem;">
+                                <li style="margin: 0.5rem 0; line-height: 1.4;">Still using <strong>old user-arn header parsing logic</strong></li>
+                                <li style="margin: 0.5rem 0; line-height: 1.4;">Authentication failures resulted in <strong>401 errors</strong> in upstream services</li>
+                                <li style="margin: 0.5rem 0; line-height: 1.4;"><strong>Lesson completions were not registered</strong> in the application</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -1255,7 +1416,7 @@
             <!-- Incident timeline -->
             <section data-transition="fade" data-menu-title="Incident timeline">
                 <div class="section-header">
-                    <h2 style="font-size: 2rem;">Incident timeline</h2>
+                    <h2 style="font-size: 2rem;">⏰ Incident timeline</h2>
                     <p class="section-subtitle" style="font-size: 1.2rem;">Chronological progression of events</p>
                 </div>
                 
@@ -1284,7 +1445,7 @@
                             </p>
                             
                             <div style="margin: 1rem 0; text-align: center;">
-                                <img src="rollbar-alert.png" 
+                                <img src="images/rollbar-alert.png" 
                                      alt="Rollbar Alert Screenshot" 
                                      class="clickable-image" 
                                      style="width: 600px; height: auto; border: 1px solid #ddd; border-radius: 8px; cursor: pointer;" />
@@ -1301,7 +1462,7 @@
                             <p>Customer Support Operations team detected issue and notified #ask-study-core channel due to substantial increase in customer support tickets.</p>
                             
                             <div style="margin: 1rem 0; text-align: center;">
-                                <img src="support-tickets-spike.png" 
+                                <img src="images/support-tickets-spike.png" 
                                      alt="Support Tickets Spike Dashboard" 
                                      class="clickable-image" 
                                      style="width: 600px; height: auto; border: 1px solid #ddd; border-radius: 8px; cursor: pointer;" />
@@ -1324,6 +1485,16 @@
                         <div class="timeline-content">
                             <h4>Incident Ticket Created</h4>
                             <p>Formal incident tracking initiated.</p>
+                            
+                            <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 0.8rem; border-radius: 6px; margin: 1rem 0;">
+                                <div style="display: flex; align-items: center; margin-bottom: 0.3rem;">
+                                    <span style="color: #856404; font-size: 1rem; margin-right: 0.5rem;">📝</span>
+                                    <strong style="color: #856404; font-size: 0.9rem;">Note</strong>
+                                </div>
+                                <p style="margin: 0; font-size: 0.95rem; color: #856404; line-height: 1.4;">
+                                    Initial severity was high because we did not know the impact at this point in time.
+                                </p>
+                            </div>
                         </div>
                     </div>
 
@@ -1336,7 +1507,7 @@
                             <p>Drop in lesson completion rate was reported to content-platform team.</p>
                             
                             <div style="margin: 1rem 0; text-align: center;">
-                                <img src="lesson-completion-drop.png" 
+                                <img src="images/lesson-completion-drop.png" 
                                      alt="Lesson Completion Rate Drop Chart" 
                                      class="clickable-image" 
                                      style="width: 600px; height: auto; border: 1px solid #ddd; border-radius: 8px; cursor: pointer;" />
@@ -1368,6 +1539,30 @@
                         <div class="timeline-content">
                             <h4>Team Collaboration</h4>
                             <p>Identity team was notified and all stakeholders gathered in a huddle to investigate the root cause.</p>
+                            
+                            <div style="background: #f0f9ff; border-left: 4px solid #3b82f6; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                                <div style="display: flex; align-items: center; margin-bottom: 0.5rem;">
+                                    <span style="color: #3b82f6; font-size: 1.2rem; margin-right: 0.5rem;">🎨</span>
+                                    <strong style="color: #1976D2;">Special Kudos</strong>
+                                </div>
+                                <p style="margin: 0; font-size: 1rem; color: #4b5563; line-height: 1.4;">
+                                    <strong>Marcel Gleeson</strong> created a comprehensive Figma board containing all relevant incident details. This visual collaboration tool was super helpful for coordinating our response efforts.
+                                </p>
+                                <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem;">
+                                    <a href="https://www.figma.com/board/LMM45zSxYGHF9278DoPlWR/BIM-4051--50--lesson-completions-failing-on-web?node-id=0-1&p=f&t=OS2lRmm98xZYCbB9-0" 
+                                       class="timeline-link" target="_blank">
+                                        🔗 View Figma Board →
+                                    </a>
+                                </p>
+                            </div>
+                            
+                            <div style="margin: 1rem 0; text-align: center;">
+                                <img src="images/figma-board.png" 
+                                     alt="Figma Board - Incident Collaboration" 
+                                     class="clickable-image" 
+                                     style="width: 600px; height: auto; border: 1px solid #ddd; border-radius: 8px; cursor: pointer;" />
+                                <p style="font-size: 0.8rem; color: #666; margin-top: 0.5rem; font-style: italic;">Click to enlarge - Figma collaboration board by Marcel Gleeson</p>
+                            </div>
                         </div>
                     </div>
 
@@ -1388,20 +1583,90 @@
                             <p>Final fix was deployed, fully resolving the incident.</p>
                         </div>
                     </div>
+
+                    <!-- Day 3: July 25th, 2025 -->
+                    <div class="timeline-event fragment fade-in-then-semi-out" data-fragment-index="10">
+                        <div class="timeline-dot process">📋</div>
+                        <div class="timeline-time">July 25, 2025 - 2:00 PM</div>
+                        <div class="timeline-content">
+                            <h4>Post-Incident Review Scheduled</h4>
+                            <p>Formal post-incident review session scheduled to analyze root causes, document lessons learned, and create action items for prevention.</p>
+                        </div>
+                    </div>
                 </div>
             </section>
 
             <!-- Incident commander role -->
             <section data-transition="fade" data-menu-title="Incident commander role">
                 <div class="section-header">
-                    <h2 style="font-size: 2rem;">Incident commander role</h2>
+                    <h2 style="font-size: 2rem;">👨‍💼 Incident commander role</h2>
                     <p class="section-subtitle" style="font-size: 1.2rem;">Key responsibilities during incident management</p>
                 </div>
                 
                 <div class="background-grid">
                     <div class="background-section fragment fade-up">
+                        <h3>🎯 Role</h3>
+                        <p>Incident commander mainly <strong>coordinates and facilitates</strong> the incident process. They might not be the one who actually works on the fix or technical issue - their focus is on <strong>orchestration, communication, and process management</strong>.</p>
+                    </div>
+
+                    <div class="background-section fragment fade-up">
                         <h3>📝 Information Management</h3>
                         <p>Collect information from stakeholders and <strong>keep the incident ticket updated</strong> with real-time status, findings, and actions taken.</p>
+                    </div>
+
+
+                    <div class="background-section fragment fade-up">
+                        <h3>📅 Post-Incident Reviews</h3>
+                        <p>Schedule post-incident reviews <strong>ASAP</strong> with the following approach:</p>
+                        <ul style="margin: 1rem 0; padding-left: 1.2rem; font-size: 1.2rem;">
+                            <li style="margin: 0.5rem 0;">Involve <strong>all stakeholders</strong> who were part of the incident</li>
+                            <li style="margin: 0.5rem 0;">If <strong>multiple teams</strong> are involved, conduct <strong>multiple reviews</strong> to ensure comprehensive coverage</li>
+                        </ul>
+                        
+                        <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <div style="display: flex; align-items: center; margin-bottom: 0.3rem;">
+                                <span style="color: #856404; font-size: 1rem; margin-right: 0.5rem;">⚠️</span>
+                                <strong style="color: #856404; font-size: 1rem;">Critical Learning</strong>
+                            </div>
+                            <p style="margin: 0; font-size: 1.1rem; color: #856404; line-height: 1.4;">
+                                <strong>No logs if reviews are delayed!</strong> In a previous incident, we missed all the logs and other relevant information because reviews were delayed.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Post incident reviews -->
+            <section data-transition="fade" data-menu-title="Post incident reviews">
+                <div class="section-header">
+                    <h2 style="font-size: 2rem;">📊 Post incident reviews</h2>
+                    <p class="section-subtitle" style="font-size: 1.2rem;">Process and action item management</p>
+                </div>
+                
+                <div class="background-grid">
+                    <div class="background-section fragment fade-up">
+                        <h3>📋 Create Post Incident Review</h3>
+                        <ul style="margin: 1rem 0; padding-left: 1.2rem; font-size: 1.2rem;">
+                            <li style="margin: 0.5rem 0;">Use the <strong>predefined template</strong> from Babbel's process documentation</li>
+                            <li style="margin: 0.5rem 0;"><strong>Duplicate</strong> the template and add incident-specific details</li>
+                        </ul>
+                        
+                        <div style="margin: 1rem 0;">
+                            <p style="font-size: 0.85rem; color: #666; margin-bottom: 0.5rem;">
+                                <a href="https://babbel.atlassian.net/wiki/spaces/BIM/pages/883982560/Template+I+Post-Incident+Review" 
+                                   class="timeline-link" target="_blank">
+                                   View Template: Post-Incident Review →
+                                </a>
+                            </p>
+                        </div>
+                        
+                        <div style="margin: 1.5rem 0; text-align: center;">
+                            <img src="images/post-incident-template.png" 
+                                 alt="Post Incident Review Template" 
+                                 class="clickable-image" 
+                                 style="width: 600px; height: auto; border: 1px solid #ddd; border-radius: 8px; cursor: pointer;" />
+                            <p style="font-size: 0.8rem; color: #666; margin-top: 0.5rem; font-style: italic;">Click to enlarge - Post-incident review template</p>
+                        </div>
                     </div>
 
                     <div class="background-section fragment fade-up">
@@ -1419,7 +1684,7 @@
                                 </div>
                                 <ul style="margin: 1rem 0; padding-left: 1.2rem; font-size: 1rem;">
                                     <li style="margin: 0.4rem 0;"><strong>Affected users:</strong> Retrieved from logs, events, or Rollbar occurrences</li>
-                                    <li style="margin: 0.4rem 0;"><strong>Daily active users:</strong> Retrieved from Amplitude analytics</li>
+                                    <li style="margin: 0.4rem 0;"><strong>Daily active users:</strong> Retrieved from <a href="https://app.amplitude.com/analytics/babbel/chart/ss48kzfz" class="timeline-link" target="_blank">Amplitude analytics</a></li>
                                 </ul>
                             </div>
                             
@@ -1453,7 +1718,7 @@
                         </div>
                         
                         <div style="margin: 1.5rem 0; text-align: center;">
-                            <img src="impact-analysis.png" 
+                            <img src="images/impact-analysis.png" 
                                  alt="Impact Analysis Dashboard" 
                                  class="clickable-image" 
                                  style="width: 600px; height: auto; border: 1px solid #ddd; border-radius: 8px; cursor: pointer;" />
@@ -1462,62 +1727,8 @@
                     </div>
 
                     <div class="background-section fragment fade-up">
-                        <h3>📅 Post-Incident Reviews</h3>
-                        <p>Schedule post-incident reviews <strong>ASAP</strong> with the following approach:</p>
-                        <ul style="margin: 1rem 0; padding-left: 1.2rem; font-size: 1.2rem;">
-                            <li style="margin: 0.5rem 0;">Involve <strong>all stakeholders</strong> who were part of the incident</li>
-                            <li style="margin: 0.5rem 0;">If <strong>multiple teams</strong> are involved, conduct <strong>multiple reviews</strong> to ensure comprehensive coverage</li>
-                        </ul>
-                    </div>
-
-                    <div class="background-section fragment fade-up">
                         <h3>⚡ Severity Adjustment</h3>
                         <p>After completing impact analysis, <strong>adjust the severity</strong> of the incident if required based on the calculated impact and business implications.</p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Post incident reviews -->
-            <section data-transition="fade" data-menu-title="Post incident reviews">
-                <div class="section-header">
-                    <h2 style="font-size: 2rem;">Post incident reviews</h2>
-                    <p class="section-subtitle" style="font-size: 1.2rem;">Process and action item management</p>
-                </div>
-                
-                <div class="background-grid">
-                    <div class="background-section fragment fade-up">
-                        <h3>📋 Create Post Incident Review</h3>
-                        <ul style="margin: 1rem 0; padding-left: 1.2rem; font-size: 1.2rem;">
-                            <li style="margin: 0.5rem 0;">Use the <strong>predefined template</strong> from Babbel's process documentation</li>
-                            <li style="margin: 0.5rem 0;"><strong>Duplicate</strong> the template and add incident-specific details</li>
-                        </ul>
-                        
-                        <div style="margin: 1rem 0;">
-                            <p style="font-size: 0.85rem; color: #666; margin-bottom: 0.5rem;">
-                                <a href="https://babbel.atlassian.net/wiki/spaces/BIM/pages/883982560/Template+I+Post-Incident+Review" 
-                                   class="timeline-link" target="_blank">
-                                   View Template: Post-Incident Review →
-                                </a>
-                            </p>
-                        </div>
-                        
-                        <div style="margin: 1.5rem 0; text-align: center;">
-                            <img src="post-incident-template.png" 
-                                 alt="Post Incident Review Template" 
-                                 class="clickable-image" 
-                                 style="width: 600px; height: auto; border: 1px solid #ddd; border-radius: 8px; cursor: pointer;" />
-                            <p style="font-size: 0.8rem; color: #666; margin-top: 0.5rem; font-style: italic;">Click to enlarge - Post-incident review template</p>
-                        </div>
-                    </div>
-
-                    <div class="background-section fragment fade-up">
-                        <h3>⏰ Schedule Reviews Early</h3>
-                        <p>Schedule reviews <strong>as early as possible</strong> so no context is missed while details are still fresh in everyone's memory.</p>
-                    </div>
-
-                    <div class="background-section fragment fade-up">
-                        <h3>👥 Involve All Parties</h3>
-                        <p>Ensure <strong>all stakeholders</strong> who were involved in the incident participate in the review process for complete perspective.</p>
                     </div>
 
                     <div class="background-section fragment fade-up">
@@ -1540,7 +1751,7 @@
                         </div>
                         
                         <div style="margin: 1.5rem 0; text-align: center;">
-                            <img src="action-items.png" 
+                            <img src="images/action-items.png" 
                                  alt="JIRA Action Items Example" 
                                  class="clickable-image" 
                                  style="width: 600px; height: auto; border: 1px solid #ddd; border-radius: 8px; cursor: pointer;" />
@@ -1550,11 +1761,60 @@
                 </div>
             </section>
 
+            <!-- Conclusion -->
+            <section data-transition="fade" data-menu-title="Conclusion" data-auto-animate>
+                <div class="section-header">
+                    <h2 style="font-size: 2rem;" data-auto-animate-id="main-heading">🔑 Key Learnings & Conclusion</h2>
+                    <p class="section-subtitle" style="font-size: 1.2rem;" data-auto-animate-id="subtitle">What we learned and how we'll grow stronger</p>
+                </div>
+                
+                <div class="background-grid">
+                    <div class="background-section">
+                        <h3>🎯 Critical Learnings</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin: 1.5rem 0;">
+                            <div>
+                                <h4 style="color: var(--babbel-dark-orange); font-size: 1.2rem; margin: 0 0 0.8rem 0;">🔍 Visibility & Observability</h4>
+                                <ul style="margin: 0; padding-left: 1.2rem; font-size: 1.1rem;">
+                                    <li style="margin: 0.5rem 0; line-height: 1.4;">Know <strong>all your clients</strong> - maintain visibility of API consumers</li>
+                                    <li style="margin: 0.5rem 0; line-height: 1.4;">Monitor the <strong>right alerts</strong> - detect issues before customers do</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 style="color: var(--babbel-dark-orange); font-size: 1.2rem; margin: 0 0 0.8rem 0;">🗣️ Communication & Process</h4>
+                                <ul style="margin: 0; padding-left: 1.2rem; font-size: 1.1rem;">
+                                    <li style="margin: 0.5rem 0; line-height: 1.4;">Single channel notifications <strong>aren't enough</strong></li>
+                                    <li style="margin: 0.5rem 0; line-height: 1.4;">Use PagerDuty(No Manual rollbacks for other teams services) for <strong>cross-team coordination</strong></li>
+                                    <li style="margin: 0.5rem 0; line-height: 1.4;">Schedule reviews <strong>ASAP</strong> - logs expire</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div style="margin: 1.5rem 0;">
+                            <h4 style="color: var(--babbel-dark-orange); font-size: 1.2rem; margin: 0 0 0.8rem 0;">🧪 Testing & Prevention</h4>
+                            <ul style="margin: 0; padding-left: 1.2rem; font-size: 1.1rem;">
+                                <li style="margin: 0.5rem 0; line-height: 1.4;">Automated testing framework for <strong>breaking changes</strong> in staging</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="background-section">
+                        <div style="text-align: center; padding: 3rem 2rem;">
+                            <div style="background: linear-gradient(135deg, var(--babbel-orange), var(--babbel-dark-orange)); padding: 3rem 2rem; border-radius: 20px; box-shadow: 0 8px 32px rgba(254, 77, 0, 0.2); margin: 2rem auto; max-width: 600px; position: relative; overflow: hidden;">
+                                <div style="position: absolute; top: -20px; right: -20px; width: 80px; height: 80px; background: rgba(255,255,255,0.1); border-radius: 50%; opacity: 0.6;"></div>
+                                <div style="position: absolute; bottom: -30px; left: -30px; width: 100px; height: 100px; background: rgba(255,255,255,0.05); border-radius: 50%; opacity: 0.8;"></div>
+                                <p style="margin: 0; font-size: 2.2rem; line-height: 1.6; color: white; font-weight: 600; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); position: relative; z-index: 2;">
+                                    💡 Every incident teaches us something.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <!-- Q&A -->
             <section class="title-slide" data-menu-title="Q&A">
-                <div style="width: 100%; max-width: 800px; margin: 0 auto; padding-top: 4rem; text-align: center;">
+                <div style="width: 100%; max-width: 800px; margin: 0 auto; padding-top: 12rem; text-align: center;">
                     <h1 style="color: white; margin: 0 0 2rem 0; font-size: 4rem;">
-                        Q&A
+                        Q&A ❓
                     </h1>
                     <h3 style="color: rgba(255,255,255,0.9); font-weight: 400; margin-bottom: 3rem;">Questions & Discussion</h3>
                     <p style="color: rgba(255,255,255,0.8); font-size: 1.2em; font-weight: 300;">
@@ -1627,16 +1887,18 @@
         
         // Slide titles for navigation
         const slideData = [
-            { title: 'The 25th hour and beyond', section: 0 },
-            { title: 'Agenda', section: 1 },
-            { title: 'Introduction', section: 2 },
-            { title: 'Background', section: 3 },
-            { title: 'Measures taken', section: 4 },
-            { title: 'How Clients got affected?', section: 5 },
-            { title: 'Incident timeline', section: 6 },
-            { title: 'Incident commander role', section: 7 },
-            { title: 'Post incident reviews', section: 8 },
-            { title: 'Q&A', section: 9 }
+            { title: '🕒 The 25th hour and beyond', section: 0 },
+            { title: '📋 Agenda', section: 1 },
+            { title: '🎯 Why We\'re Here Today', section: 2 },
+            { title: '🌱 Learning Together', section: 3 },
+            { title: '📚 Background', section: 4 },
+            { title: '🛡️ Measures taken', section: 5 },
+            { title: '💥 How Clients got affected?', section: 6 },
+            { title: '⏰ Incident timeline', section: 7 },
+            { title: '👨‍💼 Incident commander role', section: 8 },
+            { title: '📊 Post incident reviews', section: 9 },
+            { title: '🔑 Key Learnings & Conclusion', section: 10 },
+            { title: 'Q&A ❓', section: 11 }
         ];
         
         function toggleCustomMenu() {
