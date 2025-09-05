@@ -574,6 +574,7 @@
         .timeline-dot.incident { background: #8b5cf6; }
         .timeline-dot.fix { background: #06b6d4; }
         .timeline-dot.resolution { background: #059669; }
+        .timeline-dot.process { background: #3b82f6; }
 
         .timeline-time {
             font-weight: 600;
@@ -1049,7 +1050,7 @@
 <body>
     <!-- Babbel Header -->
     <div class="babbel-header">
-        <img src="logo.png" alt="Babbel Logo" class="babbel-logo"/>
+        <img src="images/logo.png" alt="Babbel Logo" class="babbel-logo"/>
         
         <!-- Menu Toggle Button -->
         <div class="menu-toggle" id="menuToggle">
@@ -1284,7 +1285,7 @@
                             </p>
                             
                             <div style="margin: 1rem 0; text-align: center;">
-                                <img src="rollbar-alert.png" 
+                                <img src="images/rollbar-alert.png" 
                                      alt="Rollbar Alert Screenshot" 
                                      class="clickable-image" 
                                      style="width: 600px; height: auto; border: 1px solid #ddd; border-radius: 8px; cursor: pointer;" />
@@ -1301,7 +1302,7 @@
                             <p>Customer Support Operations team detected issue and notified #ask-study-core channel due to substantial increase in customer support tickets.</p>
                             
                             <div style="margin: 1rem 0; text-align: center;">
-                                <img src="support-tickets-spike.png" 
+                                <img src="images/support-tickets-spike.png" 
                                      alt="Support Tickets Spike Dashboard" 
                                      class="clickable-image" 
                                      style="width: 600px; height: auto; border: 1px solid #ddd; border-radius: 8px; cursor: pointer;" />
@@ -1324,6 +1325,16 @@
                         <div class="timeline-content">
                             <h4>Incident Ticket Created</h4>
                             <p>Formal incident tracking initiated.</p>
+                            
+                            <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 0.8rem; border-radius: 6px; margin: 1rem 0;">
+                                <div style="display: flex; align-items: center; margin-bottom: 0.3rem;">
+                                    <span style="color: #856404; font-size: 1rem; margin-right: 0.5rem;">📝</span>
+                                    <strong style="color: #856404; font-size: 0.9rem;">Note</strong>
+                                </div>
+                                <p style="margin: 0; font-size: 0.95rem; color: #856404; line-height: 1.4;">
+                                    Initial severity was high because we did not know the impact at this point in time.
+                                </p>
+                            </div>
                         </div>
                     </div>
 
@@ -1336,7 +1347,7 @@
                             <p>Drop in lesson completion rate was reported to content-platform team.</p>
                             
                             <div style="margin: 1rem 0; text-align: center;">
-                                <img src="lesson-completion-drop.png" 
+                                <img src="images/lesson-completion-drop.png" 
                                      alt="Lesson Completion Rate Drop Chart" 
                                      class="clickable-image" 
                                      style="width: 600px; height: auto; border: 1px solid #ddd; border-radius: 8px; cursor: pointer;" />
@@ -1368,6 +1379,30 @@
                         <div class="timeline-content">
                             <h4>Team Collaboration</h4>
                             <p>Identity team was notified and all stakeholders gathered in a huddle to investigate the root cause.</p>
+                            
+                            <div style="background: #f0f9ff; border-left: 4px solid #3b82f6; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                                <div style="display: flex; align-items: center; margin-bottom: 0.5rem;">
+                                    <span style="color: #3b82f6; font-size: 1.2rem; margin-right: 0.5rem;">🎨</span>
+                                    <strong style="color: #1976D2;">Special Kudos</strong>
+                                </div>
+                                <p style="margin: 0; font-size: 1rem; color: #4b5563; line-height: 1.4;">
+                                    <strong>Marcel Gleeson</strong> created a comprehensive Figma board containing all relevant incident details. This visual collaboration tool was super helpful for coordinating our response efforts.
+                                </p>
+                                <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem;">
+                                    <a href="https://www.figma.com/board/LMM45zSxYGHF9278DoPlWR/BIM-4051--50--lesson-completions-failing-on-web?node-id=0-1&p=f&t=OS2lRmm98xZYCbB9-0" 
+                                       class="timeline-link" target="_blank">
+                                        🔗 View Figma Board →
+                                    </a>
+                                </p>
+                            </div>
+                            
+                            <div style="margin: 1rem 0; text-align: center;">
+                                <img src="images/figma-board.png" 
+                                     alt="Figma Board - Incident Collaboration" 
+                                     class="clickable-image" 
+                                     style="width: 600px; height: auto; border: 1px solid #ddd; border-radius: 8px; cursor: pointer;" />
+                                <p style="font-size: 0.8rem; color: #666; margin-top: 0.5rem; font-style: italic;">Click to enlarge - Figma collaboration board by Marcel Gleeson</p>
+                            </div>
                         </div>
                     </div>
 
@@ -1386,6 +1421,16 @@
                         <div class="timeline-content">
                             <h4>Resolution Deployed</h4>
                             <p>Final fix was deployed, fully resolving the incident.</p>
+                        </div>
+                    </div>
+
+                    <!-- Day 3: July 25th, 2025 -->
+                    <div class="timeline-event fragment fade-in-then-semi-out" data-fragment-index="10">
+                        <div class="timeline-dot process">📋</div>
+                        <div class="timeline-time">July 25, 2025 - 2:00 PM</div>
+                        <div class="timeline-content">
+                            <h4>Post-Incident Review Scheduled</h4>
+                            <p>Formal post-incident review session scheduled to analyze root causes, document lessons learned, and create action items for prevention.</p>
                         </div>
                     </div>
                 </div>
@@ -1453,7 +1498,7 @@
                         </div>
                         
                         <div style="margin: 1.5rem 0; text-align: center;">
-                            <img src="impact-analysis.png" 
+                            <img src="images/impact-analysis.png" 
                                  alt="Impact Analysis Dashboard" 
                                  class="clickable-image" 
                                  style="width: 600px; height: auto; border: 1px solid #ddd; border-radius: 8px; cursor: pointer;" />
@@ -1502,7 +1547,7 @@
                         </div>
                         
                         <div style="margin: 1.5rem 0; text-align: center;">
-                            <img src="post-incident-template.png" 
+                            <img src="images/post-incident-template.png" 
                                  alt="Post Incident Review Template" 
                                  class="clickable-image" 
                                  style="width: 600px; height: auto; border: 1px solid #ddd; border-radius: 8px; cursor: pointer;" />
@@ -1540,7 +1585,7 @@
                         </div>
                         
                         <div style="margin: 1.5rem 0; text-align: center;">
-                            <img src="action-items.png" 
+                            <img src="images/action-items.png" 
                                  alt="JIRA Action Items Example" 
                                  class="clickable-image" 
                                  style="width: 600px; height: auto; border: 1px solid #ddd; border-radius: 8px; cursor: pointer;" />
